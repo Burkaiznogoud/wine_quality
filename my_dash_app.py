@@ -52,6 +52,21 @@ def get_scatter_chart(entered_value_x, entered_value_y):
     fig = px.scatter(df_entered, x = entered_value_x, y = entered_value_y)
     return fig
 
+@app.callback(
+    [Output(component_id = 'drop_x', component_property = 'options'),
+    Output(component_id = 'drop_y', component_property = 'options')],
+    [Input(component_id = 'drop_x', component_property = 'value'),
+    Input(component_id = 'drop_y', component_property = 'value')]
+)
+def update_dropdown_options(selected_x, selected_y):
+    available_options = df.columns.tolist()
+    # Create disabled options for selected values
+    disabled_option_x = [{'label': option, 'value': option, 'disabled': True} if option == selected_y else {'label': option, 'value': option}
+                          for option in available_options]
+    disabled_option_y = [{'label': option, 'value': option, 'disabled': True} if option == selected_x else {'label': option, 'value': option}
+                          for option in available_options]
+
+    return disabled_option_x, disabled_option_y
 
 if __name__ == '__main__':
     app.run_server(port=8080)
