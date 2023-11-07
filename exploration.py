@@ -4,13 +4,17 @@ import matplotlib.pyplot as plt
 
 filename = "RedWine.csv"
 
+def capitalize_columns(data):
+    capitalized_columns = { name : name.capitalize() for name in data.columns}
+    data.rename(columns=capitalized_columns, inplace=True)
+
 def set_options(file):
     pd.set_option('display.max_columns', None)
     pd.set_option('display.max_colwidth', None)
     pd.options.display.float_format = '{:.3f}'.format
     return pd.read_csv(file)
 
-def create_scatter_plot(data, x_factor, y_factor, fontsize):
+def create_scatter_plot(data, x_factor, y_factor, fontsize=None):
     plt.figure(figsize = (12 , 6))
     plt.scatter(data[x_factor], data[y_factor], marker='.')
     plt.xlabel(f"{x_factor}", fontsize = fontsize, fontweight = 'bold', labelpad = 15)
