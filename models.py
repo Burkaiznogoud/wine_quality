@@ -3,11 +3,11 @@ import numpy as np
 from sklearn.model_selection import train_test_split # Allows us to split our data into training and testing data
 from sklearn.preprocessing import StandardScaler
 import algorithm as a
-import select_K_Best as skb
-import svm
-import recursive_feature_elimination as rfe
-import logistic_regression as lr
-import decision_tree as dt
+from algorithms import select_K_Best as skb
+from algorithms import svm
+from algorithms import recursive_feature_elimination as rfe
+from algorithms import logistic_regression as lr
+from algorithms import decision_tree as dt
 import prepare_file as prep
 
    
