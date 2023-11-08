@@ -7,7 +7,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split # Allows us to split our data into training and testing data
 from sklearn.model_selection import GridSearchCV # Allows us to test parameters of classification algorithms and find the best one
-from sklearn.linear_model import LinearRegression # Linear Regression algorithm
+from sklearn.linear_model import LogisticRegression # Linear Regression algorithm
 from sklearn.svm import SVC # Support Vector Machine algorithm
 from sklearn.tree import DecisionTreeClassifier # Decision Tree Classifier algorithm
 from sklearn.feature_selection import RFE # Recursie Feature Elimination algorithm
@@ -15,16 +15,6 @@ from sklearn.feature_selection import SelectKBest, f_classif # Select K Best alg
 from sklearn.metrics import make_scorer
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
-def plot_confusion_matrix(_Y, _Y_hat):
-    "this function plots the confusion matrix"
-    cm = confusion_matrix(_Y, _Y_hat)
-    ax= plt.subplot()
-    sns.heatmap(cm, annot=True, ax = ax)
-    ax.set_xlabel('Predicted labels')
-    ax.set_ylabel('True labels')
-    ax.set_title('Confusion Matrix'); 
-    ax.xaxis.set_ticklabels(['Not recommended', 'Recommended']); ax.yaxis.set_ticklabels(['Not recommended', 'Recommended'])
-    plt.show()
 
 class PrepareFile:
     def __init__(self, file, column) -> None:
@@ -52,11 +42,10 @@ class PrepareFile:
 
 
 # LinearRegression
-class LinearRegression_Algorithm:
+class LogisticRegression_Algorithm:
     def __init__(self, _X_train, _X_test, _Y_train, _Y_test):
-        self.parameters = { 'fit_intercept': [True],
-                            'copy_X': [True]}
-        self.estimator = LinearRegression()
+        self.parameters = {"C":[0.01,0.1,1],'penalty':['l2'], 'solver':['lbfgs']}
+        self.estimator = LogisticRegression()
         self.lr_cv = GridSearchCV(cv = 10, param_grid=self.parameters, estimator=self.estimator)
         self.lr_cv.fit(_X_train, _Y_train)
         self.score = self.lr_cv.score(_X_test, _Y_test)
@@ -102,22 +91,72 @@ class SKB_Algorithm:
         print("Tuned hyperparameters :(best parameters) ", self.skb_cv.best_params_)
         print("Accuracy : ", self.skb_cv.best_score_)
 
+class LogisticRegression_Algorithm:
+
+    def __init__(self, _X_train, _X_test, _Y_train, _Y_test):
+        self.X = _X_train
+        self.Y = _Y_train
+        self.x = _X_test
+        self.y = _Y_test
+        self.estimator = LogisticRegression()
+        self.parameters = {"C":[0.01,0.1,1],'penalty':['l2'], 'solver':['lbfgs']}
+        self.lr_cv = GridSearchCV(cv = 10, param_grid=self.parameters, estimator=self.estimator)
+        self.lr_cv.fit(self.X, self.Y)
+        self.score = self.lr_cv.score(self.x, self.y)
+        self.Y_hat = self.lr_cv.predict(self.x)
+
+    def hyperparameters_score(self):
+        print("Tuned hyperparameters :(best parameters) ", self.lr_cv.best_params_)
+        print("Accuracy : ", self.lr_cv.best_score_)
+        print(self.score)
+
+    def plot_confusion_matrix(self,):
+        "this function plots the confusion matrix"
+        cm = confusion_matrix(self.y, self.Y_hat)
+        ax= plt.subplot()
+        sns.heatmap(cm, annot=True, ax = ax)
+        ax.set_xlabel('Predicted labels')
+        ax.set_ylabel('True labels')
+        ax.set_title('Confusion Matrix'); 
+        ax.xaxis.set_ticklabels(['Not recommended', 'Recommended']); ax.yaxis.set_ticklabels(['Not recommended', 'Recommended'])
+        plt.show()
+
 
 # Recursive Feature Elimination
 class RFE_Algorithm:
-    def __init__(self, _X_train, _X_test, _Y_train, _Y_test):
+   
+    def __init__(self, _X_train, _X_test, _Y_train, _Y_test, estimator):
         self.parameters = { 'n_features_to_select': [3, 6, 9],
                             'step': [1, 3]}
-        self.estimator = RFE()
-        self.rfe_cv = GridSearchCV(cv = 10, param_grid=self.parameters, estimator=self.estimator)
-        self.rfe_cv.fit(_X_train, _Y_train)
-        self.score = self.rfe_cv.score(_X_test, _Y_test)
-        self.Y_hat = self.rfe_cv.predict(_X_test)
+        self.X = _X_train
+        self.Y = _Y_train
+        self.x = _X_test
+        self.y = _Y_test
+        self.estimator = RFE(estimator = estimator)
+        self.rfe_cv = GridSearchCV(cv = 10, param_grid = self.parameters, estimator = self.estimator)
+        self.fit, self.score, self.Y_hat = self.fit_score_predict()
+
+    def fit_score_predict(self):
+        self.fit = self.rfe_cv.fit(self.X, self.Y)
+        self.score = self.rfe_cv.score(self.x, self.y)
+        self.Y_hat = self.rfe_cv.predict(self.x)
+        return self.fit, self.score, self.Y_hat
 
     def hyperparameters_score(self):
         print("Tuned hyperparameters :(best parameters) ", self.rfe_cv.best_params_)
         print("Accuracy : ", self.rfe_cv.best_score_)
         print(self.score)
+
+    def plot_confusion_matrix(self,):
+        "this function plots the confusion matrix"
+        cm = confusion_matrix(self.y, self.Y_hat)
+        ax= plt.subplot()
+        sns.heatmap(cm, annot=True, ax = ax)
+        ax.set_xlabel('Predicted labels')
+        ax.set_ylabel('True labels')
+        ax.set_title('Confusion Matrix'); 
+        ax.xaxis.set_ticklabels(['Not recommended', 'Recommended']); ax.yaxis.set_ticklabels(['Not recommended', 'Recommended'])
+        plt.show()
 
 
 # Decision Tree Classifier
@@ -129,16 +168,30 @@ class DecisionTree_Algorithm:
                             'max_features': ['auto', 'sqrt', 'log2'],
                             'min_samples_leaf': [1, 2, 4],
                             'min_samples_split': [2, 5, 10]}
+        self.Y = _Y_test
         self.estimator = DecisionTreeClassifier()
         self.tree_cv = GridSearchCV(cv = 10, param_grid=self.parameters, estimator=self.estimator)
         self.tree_cv.fit(_X_train, _Y_train)
         self.score = self.tree_cv.score(_X_test, _Y_test)
         self.Y_hat = self.tree_cv.predict(_X_test)
+        
 
     def hyperparameters_score(self):
         print("Tuned hyperparameters :(best parameters) ", self.tree_cv.best_params_)
         print("Accuracy : ", self.tree_cv.best_score_)
         print(self.score)
+
+    def plot_confusion_matrix(self):
+        "this function plots the confusion matrix"
+        cm = confusion_matrix(self.Y, self.Y_hat)
+        ax= plt.subplot()
+        sns.heatmap(cm, annot=True, ax = ax)
+        ax.set_xlabel('Predicted labels')
+        ax.set_ylabel('True labels')
+        ax.set_title('Confusion Matrix'); 
+        ax.xaxis.set_ticklabels(['Not recommended', 'Recommended']); ax.yaxis.set_ticklabels(['Not recommended', 'Recommended'])
+        plt.show()
+
         
 # Initialization of StandardScaler object
 transform = StandardScaler()    
@@ -180,6 +233,9 @@ skb = SKB_Algorithm(X_train, X_test, Y_train, Y_test)
 skb.hyperparameters_score()
 """
 
-rfe = RFE_Algorithm(X_train, X_test, Y_train, Y_test)
+lr = LogisticRegression_Algorithm(X_train, X_test, Y_train, Y_test)
+lr.hyperparameters_score()
+
+rfe = RFE_Algorithm(X_train, X_test, Y_train, Y_test, estimator = lr.estimator)
 rfe.hyperparameters_score()
-plot_confusion_matrix(Y_test, rfe.Y_hat)
+rfe.plot_confusion_matrix()
