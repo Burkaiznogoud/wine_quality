@@ -13,7 +13,7 @@ import prepare_file as prep
    
 # Initialization of StandardScaler object
 transform = StandardScaler()    
-data = prep.PrepareFile(file='RedWine.csv', column='Recommended')
+data = prep.PrepareFile(file='datafiles\RedWine.csv', column='Recommended')
 
 Y = data.Y
 # Normalize data using StandardScaler
