@@ -13,7 +13,7 @@ import prepare_file as prep
    
 # Initialization of StandardScaler object
 transform = StandardScaler()    
-data = prep.PrepareFile(file='datafiles\RedWine.csv', column='Recommended')
+data = prep.PrepareFile(file='datafiles\RedWine.csv', Y_column='Recommended', columns_to_exclude=['Quality', 'Id'])
 
 Y = data.Y
 # Normalize data using StandardScaler
@@ -22,12 +22,14 @@ X = transform.fit_transform(data.X)
 # train, test, split
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=4)
 
-
-lr = lr.LogisticRegression_Algorithm()
-rfe = rfe.RFE_Algorithm(estimator=lr.estimator)
-algorithm = a.Algorithm(X_train, X_test, Y_train, Y_test, estimator = rfe.estimator, params = rfe.parameters)
-print(rfe.get_feature_ranking(X, Y, columns=data.X_columns))
-print(rfe.selected_features)
-print(rfe.estimator.ranking_)
+print(data.X_columns)
+# lr = lr.LogisticRegression_Algorithm()
+# rfe = rfe.RFE_Algorithm(estimator=lr.estimator)
+d_tree = dt.DecisionTree_Algorithm()
+algorithm = a.Algorithm(X_train, X_test, Y_train, Y_test, estimator = d_tree.estimator, params = d_tree.parameters)
+# print(rfe.get_feature_ranking(X, Y, columns=data.X_columns))
+# print(rfe.selected_features)
+# print(rfe.estimator.ranking_)
+print(d_tree.get_feature_importance(X, Y, columns=data.X_columns))
 algorithm.hyperparameters_score()
 algorithm.plot_confusion_matrix()
