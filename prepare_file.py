@@ -4,6 +4,8 @@ import numpy as np
 class PrepareFile:
     def __init__(self, file, column) -> None:
         self.file = self.options(file)
+        self.Y_column = column
+        self.X_columns = [col for col in self.file.columns if col != self.Y_column]
         self.X = self.prepare_X()
         self.Y = self.prepare_Y(column=column)
 

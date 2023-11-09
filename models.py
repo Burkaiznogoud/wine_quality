@@ -26,5 +26,8 @@ X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_
 lr = lr.LogisticRegression_Algorithm()
 rfe = rfe.RFE_Algorithm(estimator=lr.estimator)
 algorithm = a.Algorithm(X_train, X_test, Y_train, Y_test, estimator = rfe.estimator, params = rfe.parameters)
+print(rfe.get_feature_ranking(X, Y, columns=data.X_columns))
+print(rfe.selected_features)
+print(rfe.estimator.ranking_)
 algorithm.hyperparameters_score()
 algorithm.plot_confusion_matrix()

@@ -29,7 +29,7 @@ class Algorithm:
         "this function plots the confusion matrix"
         cm = confusion_matrix(self.y, self.Y_hat)
         ax= plt.subplot()
-        sns.heatmap(cm, annot=True, ax = ax)
+        sns.heatmap(cm, annot=True, ax = ax, fmt='d')
         ax.set_xlabel('Predicted labels')
         ax.set_ylabel('True labels')
         ax.set_title('Confusion Matrix'); 
