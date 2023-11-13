@@ -12,13 +12,18 @@ class PrepareFile:
         
 
     def options(self, file):
+        print(20 * "-")
+        print(f"Reading {file} file from CSV.")
+        print(20 * "-")
         file = pd.read_csv(file)
         pd.set_option('display.max_columns', None)
         pd.set_option('display.max_colwidth', None)
-        print(file.head())
         return file
     
     def prepare_Y(self, Y_column):
+        print(20 * "-")
+        print(f"Extracting {Y_column} and converting it to numpy.")
+        print(20 * "-")
         Y = self.file[Y_column]
         Y = Y.replace({True: np.float64(1), False: np.float64(0)})
         Y = Y.to_numpy()
@@ -28,11 +33,17 @@ class PrepareFile:
 
     def prepare_X(self, columns_to_exclude=None):
         if columns_to_exclude == None:
+            print(20 * "-")
+            print(f"No columns were excluded. Left dataframe is being converted to numpy array.")
+            print(20 * "-")
             X = self.file.reset_index(drop=True)
-            print(X.head())
+            X.set_index(X.columns[0], inplace=True)
             X = X.to_numpy()
         else:
+            print(20 * "-")
+            print(f"Columns {columns_to_exclude} were excluded. Left dataframe is being converted to numpy array.")
+            print(20 * "-")
             X = self.file.drop(columns_to_exclude, axis=1).reset_index(drop=True)
-            print(X.head())
+            X.set_index(X.columns[0], inplace=True)
             X = X.to_numpy()
         return X

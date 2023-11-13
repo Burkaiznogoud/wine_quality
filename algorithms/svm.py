@@ -2,6 +2,18 @@ from sklearn.svm import SVC # Support Vector Machine algorithm
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.inspection import permutation_importance
 import pandas as pd
+import time
+
+def timing_decorator(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        print(f"{func.__name__} took {elapsed_time:.4f} seconds to execute.")
+        return result
+
+    return wrapper
 
 # Support Vector Machine
 class SVM_Algorithm:
@@ -20,7 +32,11 @@ class SVM_Algorithm:
         self.accuracy, self.precision, self.recall, self.f1 = self.evaluate_model()
         self.feature_importance = self.get_feature_importance()
 
+    @timing_decorator
     def evaluate_model(self):
+        print(20 * "-")
+        print(f"Evaluating model...")
+        print(20 * "-")
         self.estimator.fit(self.X_train, self.Y_train)
         Y_hat = self.estimator.predict(self.X_test)
         self.accuracy = accuracy_score(self.Y_test, Y_hat)
@@ -29,7 +45,11 @@ class SVM_Algorithm:
         self.f1 = f1_score(self.Y_test, Y_hat)
         return self.accuracy, self.precision, self.recall, self.f1
 
+    @timing_decorator
     def get_feature_importance(self):
+        print(20 * "-")
+        print(f"Calculating feature importances...")
+        print(20 * "-")
         self.estimator.fit(self.X_train, self.Y_train)
         if len(self.X_test) != len(self.Y_test):
             raise ValueError(f"X_test {self.X_test.shape} and Y_test {self.Y_test.shape} must have the same number of samples.")
@@ -41,8 +61,8 @@ class SVM_Algorithm:
                 return features
             else:
                 result = permutation_importance(self.estimator, self.X_train, self.Y_train, n_repeats=30, random_state=4)
-                importance_std = result.importances_std[1:]
-                importances = result.importances_mean[1:]
+                importance_std = result.importances_std
+                importances = result.importances_mean
                 features = pd.DataFrame({'Feature': self.columns, 'Importance': importances, "Importance_std": importance_std})
                 features = features.sort_values(by='Importance', ascending=False)
                 return features
@@ -56,8 +76,10 @@ class SVM_Algorithm:
                 print(f"The kernel '{self.estimator.kernel}' does not support feature coefficients.")
         
     def model_info(self):
+        print(20 * "-")
         print(f"Accuracy: {self.accuracy} Precision: {self.precision} Recall: {self.recall} F1: {self.f1} \n"
                 f"Feature Importance: {self.feature_importance}")
+        print(20 * "-")
         
 
 
