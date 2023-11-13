@@ -13,6 +13,7 @@ class Algorithm:
         self.estimator = estimator
         self.cv = GridSearchCV(cv = 10, param_grid = self.parameters, estimator = self.estimator)
         self.fit, self.score, self.Y_hat = self.fit_score_predict()
+        self.best_params, self.best_accuracy, self.best_score = self.calculate_hyperparameters()
 
     def fit_score_predict(self):
         self.fit = self.cv.fit(self.X, self.Y)
@@ -20,18 +21,24 @@ class Algorithm:
         self.Y_hat = self.cv.predict(self.x)
         return self.fit, self.score, self.Y_hat
 
-    def hyperparameters_score(self):
-        print("Tuned hyperparameters :(best parameters) ", self.cv.best_params_)
-        print("Accuracy : ", self.cv.best_score_)
-        print(self.score)
+    def calculate_hyperparameters(self):
+        best_params = self.cv.best_params_
+        best_score = self.score
+        best_accuracy = self.cv.best_score_
+        return best_params, best_accuracy, best_score
+    
+    def hyperparameters_info(self):
+        print(f"Best parameters: {self.best_params}\n"
+              f"Best score :{self.best_score}\n"
+              f"Best Accuracy :{self.best_accuracy}")
 
     def plot_confusion_matrix(self):
-        "this function plots the confusion matrix"
         cm = confusion_matrix(self.y, self.Y_hat)
         ax= plt.subplot()
         sns.heatmap(cm, annot=True, ax = ax, fmt='d')
         ax.set_xlabel('Predicted labels')
         ax.set_ylabel('True labels')
         ax.set_title('Confusion Matrix'); 
-        ax.xaxis.set_ticklabels(['Not recommended', 'Recommended']); ax.yaxis.set_ticklabels(['Not recommended', 'Recommended'])
+        ax.xaxis.set_ticklabels(['Not recommended', 'Recommended']) 
+        ax.yaxis.set_ticklabels(['Not recommended', 'Recommended'])
         plt.show()

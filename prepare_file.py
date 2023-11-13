@@ -6,7 +6,7 @@ class PrepareFile:
         self.exclude = columns_to_exclude
         self.file = self.options(file)
         self.X = self.prepare_X(columns_to_exclude)
-        self.Y = self.prepare_Y(Y_column=Y_column)
+        self.Y = self.prepare_Y(Y_column)
         self.Y_column = Y_column
         self.X_columns = [col for col in self.file.columns if col != self.Y_column and col not in self.exclude]
         
@@ -15,6 +15,7 @@ class PrepareFile:
         file = pd.read_csv(file)
         pd.set_option('display.max_columns', None)
         pd.set_option('display.max_colwidth', None)
+        print(file.head())
         return file
     
     def prepare_Y(self, Y_column):
@@ -27,7 +28,11 @@ class PrepareFile:
 
     def prepare_X(self, columns_to_exclude=None):
         if columns_to_exclude == None:
-            X = self.file.to_numpy()
+            X = self.file.reset_index(drop=True)
+            print(X.head())
+            X = X.to_numpy()
         else:
-            X = self.file.drop(columns=columns_to_exclude, axis=1).to_numpy()
+            X = self.file.drop(columns_to_exclude, axis=1).reset_index(drop=True)
+            print(X.head())
+            X = X.to_numpy()
         return X
