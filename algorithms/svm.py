@@ -2,18 +2,7 @@ from sklearn.svm import SVC # Support Vector Machine algorithm
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.inspection import permutation_importance
 import pandas as pd
-import time
-
-def timing_decorator(func):
-    def wrapper(*args, **kwargs):
-        start_time = time.time()
-        result = func(*args, **kwargs)
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        print(f"{func.__name__} took {elapsed_time:.4f} seconds to execute.")
-        return result
-
-    return wrapper
+from misc.timing import timing_decorator
 
 # Support Vector Machine
 class SVM_Algorithm:
