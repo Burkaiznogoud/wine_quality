@@ -55,7 +55,8 @@ class SKB_Algorithm:
         return self.mae, self.mse, self.r2
     
     def evaluation_results(self):
-        print("-"*20)
+        print("-" * 20)
+        print(self.__class__)
         print(f"Accuracy : {self.accuracy:.4f}")
         print(f"Precison : {self.precision:.4f}")
         print(f"Recall : {self.recall:.4f}")
@@ -63,7 +64,7 @@ class SKB_Algorithm:
         print(f"Mean Absolute Error : {self.mae:.4f}")
         print(f"Mean Squared Error : {self.mse:.4f}")
         print(f"R2 Score : {self.r2:.4f}")
-        print("-"*20)
+        print("-" * 20)
     
     
 # Example usage:

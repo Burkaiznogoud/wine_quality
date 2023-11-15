@@ -22,39 +22,48 @@ X = transform.fit_transform(data.X)
 # train, test, split
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=4)
 
-select_k_best = skb.SKB_Algorithm(columns = data.X_columns, k = 3, X_train = X_train, Y_train = Y_train, X_test = X_test, Y_test = Y_test)
-select_k_best.evaluation_results()
 
-algorithm = a.Algorithm(X_train, X_test, Y_train, Y_test, params = select_k_best.parameters, estimator = select_k_best.estimator)
-cv_select_k_best = skb.SKB_Algorithm(columns = data.X_columns, k = 3, init_params = algorithm.best_params, X_train = X_train, Y_train = Y_train, X_test = X_test, Y_test = Y_test)
-cv_select_k_best.evaluation_results()
+### Select K Best ### TESTED and WORKS!
+# select_k_best = skb.SKB_Algorithm(  columns = data.X_columns,
+#                                     k = 3,
+#                                     X_train = X_train, Y_train = Y_train,
+#                                     X_test = X_test, Y_test = Y_test
+#                                     )
+# select_k_best.evaluation_results()
 
+# algorithm = a.Algorithm(X_train, X_test, Y_train, Y_test,
+#                         params = select_k_best.parameters,
+#                         estimator = select_k_best.estimator
+#                         )
+# cv_select_k_best = skb.SKB_Algorithm(columns = data.X_columns, 
+#                                      k = 3, 
+#                                      init_params = algorithm.best_params, 
+#                                      X_train = X_train, Y_train = Y_train, 
+#                                      X_test = X_test, Y_test = Y_test
+#                                      )
+# cv_select_k_best.evaluation_results()
 
-# select_k_best.score_mutual_classif()
-# algorithm = a.Algorithm(X_train, X_test, Y_train, Y_test, params = select_k_best.parameters, estimator = select_k_best.estimator)
-# algorithm.calculate_hyperparameters()
-
-
-# select_k_best.score_mutual_regression()
-# algorithm = a.Algorithm(X_train, X_test, Y_train, Y_test, params = select_k_best.parameters, estimator = select_k_best.estimator)
-# algorithm.calculate_hyperparameters()
-
-# print(f"f_classif : {select_k_best.f_classif}\n mutual_classif : {select_k_best.mutual_classification} \n mutual_regression : {select_k_best.mutual_regression}")
-# lr = lr.LogisticRegression_Algorithm()
-# rfe = rfe.RFE_Algorithm(estimator=lr.estimator)
-# d_tree = dt.DecisionTree_Algorithm()
-
-# svm = svm.SVM_Algorithm(columns= data.X_columns, X_train = X_train, Y_train = Y_train, X_test = X_test, Y_test = Y_test)
-# algorithm = a.Algorithm(X_train, X_test, Y_train, Y_test, estimator = svm.estimator, params = svm.parameters)
+### Recursive Feature Elimination ### TESTING....
+recursive_selection = rfe.RFE_Algorithm(columns= data.X_columns,
+                                        X_train = X_train, Y_train = Y_train,
+                                        X_test = X_test, Y_test = Y_test
+                                        )
+recursive_selection.evaluation_results()
+algorithm = a.Algorithm(X_train, X_test, Y_train, Y_test,
+                        estimator = recursive_selection.estimator,
+                        params = recursive_selection.parameters
+                        )
+cv_recursive_selection = rfe.RFE_Algorithm( columns= data.X_columns,
+                                            init_params = algorithm.best_params,
+                                            X_train = X_train, Y_train = Y_train,
+                                            X_test = X_test, Y_test = Y_test
+                                            )
+cv_recursive_selection.evaluation_results()
 # svm.model_info()
 # algorithm.calculate_hyperparameters()
 # algorithm.hyperparameters_info()
 # algorithm.plot_confusion_matrix()
 
-
-# print(rfe.get_feature_ranking(X, Y, columns=data.X_columns))
-# print(rfe.selected_features)
-# print(rfe.estimator.ranking_)
 # print(d_tree.get_feature_importance(X, Y, columns=data.X_columns))
 # algorithm.hyperparameters_score()
 # algorithm.plot_confusion_matrix()
