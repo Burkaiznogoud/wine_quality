@@ -5,14 +5,14 @@ import seaborn as sns
 from misc.timing import timing_decorator
 
 class Algorithm:
-    def __init__(self, _X_train, _X_test, _Y_train, _Y_test, estimator, params):
+    def __init__(self, _X_train, _X_test, _Y_train, _Y_test, params, estimator):
         self.parameters = params
+        self.estimator = estimator
         self.X = _X_train
         self.Y = _Y_train
         self.x = _X_test
         self.y = _Y_test
-        self.estimator = estimator
-        self.cv = GridSearchCV(cv = 10, param_grid = self.parameters, estimator = self.estimator)
+        self.cv = GridSearchCV(estimator = self.estimator, cv = 10, param_grid = self.parameters)
         self.fit, self.score, self.Y_hat = self.fit_score_predict()
         self.best_params, self.best_accuracy, self.best_score = self.calculate_hyperparameters()
 
