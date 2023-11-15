@@ -22,11 +22,9 @@ X = transform.fit_transform(data.X)
 # train, test, split
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=4)
 
-select_k_best = skb.SKB_Algorithm(columns = data.X_columns,  X_train = X_train, Y_train = Y_train, X_test = X_test, Y_test = Y_test)
-print(select_k_best.estimator)
-print(f"Starting X_train : {len(select_k_best.X_train)}")
-select_k_best.select_features()
-print(f"After selection X_train : {len(select_k_best.X_train)}")
+select_k_best = skb.SKB_Algorithm(columns = data.X_columns, k = 4,  X_train = X_train, Y_train = Y_train, X_test = X_test, Y_test = Y_test)
+select_k_best.evaluation_results()
+
 # select_k_best.score_f_classif()
 # print(select_k_best.f_classif, select_k_best.estimator, select_k_best.parameters)
 # algorithm = a.Algorithm(X_train, X_test, Y_train, Y_test, params = select_k_best.parameters, estimator = select_k_best.estimator)

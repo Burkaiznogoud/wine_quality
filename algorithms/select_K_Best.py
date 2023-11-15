@@ -6,7 +6,7 @@ from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error, a
 
 
 class SKB_Algorithm:
-    def __init__(self, columns, X_train, Y_train, X_test, Y_test):
+    def __init__(self, k, columns, X_train, Y_train, X_test, Y_test):
         self.parameters = { 'kernel': ['linear', 'poly'],
                             'C': [0.001, 0.01, 0.1, 1, 10],
                             'gamma':[0.001, 0.01, 0.1, 1, 10],
@@ -18,35 +18,53 @@ class SKB_Algorithm:
         self.Y_train = Y_train
         self.X_test = X_test
         self.Y_test = Y_test
+        self.K = k
         self.estimator = SVC()
+        self.calculate_Y_hat()
         self.select_features()
-        self.evaluate_mean_absolute_error()
+        self.evaluate_classification_metrics()
+        self.evaluate_regression_metrics()
 
-
-    def predict_evaluate(self):
+    def calculate_Y_hat(self):
         self.estimator.fit(self.X_train, self.Y_train)
         self.Y_hat = self.estimator.predict(self.X_test)
+        return self.Y_hat
+
+    def select_features(self):
+        skb = SelectKBest(score_func = f_classif, k = self.K)
+        skb.fit(self.X_train, self.Y_train)
+        selected_indices = skb.get_support(indices=True)
+        indices = [i for i in selected_indices]
+        selected_features = [self.columns[i] for i in selected_indices]
+        self.X_test = self.X_test[:, indices]
+        self.X_train = self.X_train[:, indices]
+        print(f"Selected Features : {selected_features}")
+        return self.X_train, self.X_test
+    
+    def evaluate_classification_metrics(self):
         self.accuracy = accuracy_score(self.Y_test, self.Y_hat)
         self.precision = precision_score(self.Y_test, self.Y_hat)
         self.recall = recall_score(self.Y_test, self.Y_hat)
         self.f1 = f1_score(self.Y_test, self.Y_hat)
-        return self.accuracy, self.precision, self.recall, self.f1, self.Y_hat
-
-    def select_features(self):
-        skb = SelectKBest(score_func = f_classif, k = 3)
-        self.X_train = skb.fit_transform(self.X_train, self.Y_train)
-        selected_indices = skb.get_support(indices=True)
-        indices = [i for i in selected_indices]
-        self.selected_features = [self.columns[i] for i in selected_indices]
-        self.X_test = self.X_test[:, indices]
-        return self.X_train, self.X_test, self.selected_features
+        return self.accuracy, self.precision, self.recall, self.f1
     
-    def evaluate_mean_absolute_error(self):
-        skb = SelectKBest(score_func=mean_absolute_error, k = 3)
-        self.predict_evaluate()
+    def evaluate_regression_metrics(self):
         self.mae = mean_absolute_error(self.Y_test, self.Y_hat)
-        print(f"Mean Absolute Error : {self.mae}")
-        return self.mae
+        self.mse = mean_squared_error(self.Y_test, self.Y_hat)
+        self.r2 = r2_score(self.Y_test, self.Y_hat)
+        return self.mae, self.mse, self.r2
+    
+    def evaluation_results(self):
+        print("-"*20)
+        print(f"Accuracy : {self.accuracy:.4f}")
+        print(f"Precison : {self.precision:.4f}")
+        print(f"Recall : {self.recall:.4f}")
+        print(f"F1 : {self.f1:.4f}")
+        print(f"Mean Absolute Error : {self.mae:.4f}")
+        print(f"Mean Squared Error : {self.mse:.4f}")
+        print(f"R2 Score : {self.r2:.4f}")
+        print("-"*20)
+    
     
 # Example usage:
 # Assuming you have your data loaded and instantiated as X_train, Y_train, X_test, and Y_test
