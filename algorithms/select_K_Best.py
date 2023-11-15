@@ -6,7 +6,7 @@ from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error, a
 
 
 class SKB_Algorithm:
-    def __init__(self, k, columns, X_train, Y_train, X_test, Y_test):
+    def __init__(self, k, columns, X_train, Y_train, X_test, Y_test, init_params = {'kernel': 'poly', 'C': 0.1, 'gamma': 0.1, 'degree': 4, 'decision_function_shape': 'ovr'}):
         self.parameters = { 'kernel': ['linear', 'poly'],
                             'C': [0.001, 0.01, 0.1, 1, 10],
                             'gamma':[0.001, 0.01, 0.1, 1, 10],
@@ -19,7 +19,7 @@ class SKB_Algorithm:
         self.X_test = X_test
         self.Y_test = Y_test
         self.K = k
-        self.estimator = SVC()
+        self.estimator = SVC(**init_params)
         self.calculate_Y_hat()
         self.select_features()
         self.evaluate_classification_metrics()

@@ -14,7 +14,8 @@ class Algorithm:
         self.y = _Y_test
         self.cv = GridSearchCV(estimator = self.estimator, cv = 10, param_grid = self.parameters)
         self.fit, self.score, self.Y_hat = self.fit_score_predict()
-        self.best_params, self.best_accuracy, self.best_score = self.calculate_hyperparameters()
+        self.calculate_hyperparameters()
+        self.hyperparameters_info()
 
     @timing_decorator
     def fit_score_predict(self):
@@ -31,10 +32,10 @@ class Algorithm:
         print(20 * "-")
         print(f"Calculating hyperparameters...")
         print(20 * "-")
-        best_params = self.cv.best_params_
-        best_score = self.score
-        best_accuracy = self.cv.best_score_
-        return best_params, best_accuracy, best_score
+        self.best_params = self.cv.best_params_
+        self.best_score = self.score
+        self.best_accuracy = self.cv.best_score_
+        return self.best_params, self.best_accuracy, self.best_score
     
     def hyperparameters_info(self):
         print(20 * "-")
