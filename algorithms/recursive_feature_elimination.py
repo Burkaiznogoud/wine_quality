@@ -20,9 +20,15 @@ class RFE_Algorithm:
 
     def instantiate_rfe(self, init_params):
         self.estimator = RFE(estimator = self.lr, **init_params)
+        print(20 * "-")
+        print(f"Instantiated {self.estimator}.")
+        print(20 * "-")
         return self.estimator
 
     def calculate_Y_hat(self):
+        print(20 * "-")
+        print(f"Processing {__name__} of {__class__}\n calculating Y_hat.")
+        print(20 * "-")
         init_params = {"C": 0.1,'penalty': 'l2', 'solver': 'lbfgs'}
         self.lr = LogisticRegression(**init_params)
         self.lr.fit(self.X_train, self.Y_train)
@@ -30,6 +36,9 @@ class RFE_Algorithm:
         return self.Y_hat, self.lr
 
     def feature_selection(self):
+        print(20 * "-")
+        print(f"Processing {__name__} of {__class__}")
+        print(20 * "-")
         self.estimator.fit(self.X_train, self.Y_train)
         features = {feature: i for i, feature in enumerate(self.columns) if self.estimator.support_[i]}
         indices = [i for i, selected in enumerate(self.estimator.support_) if selected]
@@ -39,13 +48,16 @@ class RFE_Algorithm:
         return self.estimator.ranking_, self.selected_features, self.X_train, self.X_test, self.estimator
     
     def evaluation_results(self):
-        print("-" * 20)
-        print(self.__class__)
+        print(20 * "-")
+        print(f"Evaluation results of : {__name__} of {__class__}")
         print(f"Features Ranking : {self.estimator.ranking_}")
         print(f"Features Selected : {self.selected_features}")
         print("-" * 20)
 
     def evaluate_classification_metrics(self):
+        print(20 * "-")
+        print(f"Processing {__name__} of {__class__}\n evaluating classification metrics.")
+        print(20 * "-")
         self.accuracy = accuracy_score(self.Y_test, self.Y_hat)
         self.precision = precision_score(self.Y_test, self.Y_hat)
         self.recall = recall_score(self.Y_test, self.Y_hat)
@@ -53,6 +65,9 @@ class RFE_Algorithm:
         return self.accuracy, self.precision, self.recall, self.f1
     
     def evaluate_regression_metrics(self):
+        print(20 * "-")
+        print(f"Processing {__name__} of {__class__}\n evaluating regression metrics.")
+        print(20 * "-")
         self.mae = mean_absolute_error(self.Y_test, self.Y_hat)
         self.mse = mean_squared_error(self.Y_test, self.Y_hat)
         self.r2 = r2_score(self.Y_test, self.Y_hat)
@@ -60,7 +75,7 @@ class RFE_Algorithm:
     
     def evaluation_results(self):
         print("-" * 20)
-        print(self.__class__)
+        print(f"Evaluation results of : {__name__} of {__class__}")
         print(f"Accuracy : {self.accuracy:.4f}")
         print(f"Precison : {self.precision:.4f}")
         print(f"Recall : {self.recall:.4f}")
@@ -70,13 +85,6 @@ class RFE_Algorithm:
         print(f"R2 Score : {self.r2:.4f}")
         print("-" * 20)
 """
-rfe = Algorithm(X_train, X_test, Y_train, Y_test, estimator = lr.estimator)
-rfe.hyperparameters_score()
-rfe.plot_confusion_matrix()
-Tuned hyperparameters :(best parameters)  {'n_features_to_select': 3, 'step': 1}
-Accuracy :  1.0
-1.0
-
 Recursive Feature Elimination (RFE) is a feature selection algorithm used in machine learning
 to systematically eliminate less important features from a dataset.
 It is typically applied in the context of supervised learning,

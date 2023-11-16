@@ -18,13 +18,14 @@ class SVM_Algorithm:
         self.X_test = X_test
         self.Y_test = Y_test
         self.estimator = SVC()
-        self.accuracy, self.precision, self.recall, self.f1 = self.evaluate_model()
-        self.feature_importance = self.get_feature_importance()
+        self.evaluate_classification_metrics()
+        self.get_feature_importance()
+        self.evaluation_results()
 
     @timing_decorator
-    def evaluate_model(self):
+    def evaluate_classification_metrics(self):
         print(20 * "-")
-        print(f"Evaluating model...")
+        print(f"Processing {__name__} of {__class__}\n evaluating classification metrics.")
         print(20 * "-")
         self.estimator.fit(self.X_train, self.Y_train)
         Y_hat = self.estimator.predict(self.X_test)
@@ -37,7 +38,7 @@ class SVM_Algorithm:
     @timing_decorator
     def get_feature_importance(self):
         print(20 * "-")
-        print(f"Calculating feature importances...")
+        print(f"Processing {__name__} of {__class__}\n selecting features and their importances.")
         print(20 * "-")
         self.estimator.fit(self.X_train, self.Y_train)
         if len(self.X_test) != len(self.Y_test):
@@ -45,16 +46,16 @@ class SVM_Algorithm:
         try:
             if self.estimator.kernel == 'linear':
                 coefficients = self.estimator.coef_[0]
-                features = pd.DataFrame({'Feature': self.columns, 'Coefficient': coefficients})
-                features = features.reindex(features['Coefficient'].abs().sort_values(ascending=False).index)
-                return features
+                self.selected_features = pd.DataFrame({'Feature': self.columns, 'Coefficient': coefficients})
+                self.selected_features = self.selected_features.reindex(self.selected_features['Coefficient'].abs().sort_values(ascending=False).index)
+                return self.selected_features
             else:
                 result = permutation_importance(self.estimator, self.X_train, self.Y_train, n_repeats=30, random_state=4)
                 importance_std = result.importances_std
                 importances = result.importances_mean
-                features = pd.DataFrame({'Feature': self.columns, 'Importance': importances, "Importance_std": importance_std})
-                features = features.sort_values(by='Importance', ascending=False)
-                return features
+                self.selected_features = pd.DataFrame({'Feature': self.columns, 'Importance': importances, "Importance_std": importance_std})
+                self.selected_features = self.selected_features.sort_values(by='Importance', ascending=False)
+                return self.selected_features
         except AttributeError as e:
             if self.estimator.kernel == 'linear' and not hasattr(self.estimator, 'probability'):
                 print(f"The kernel '{self.estimator.kernel}' does not support feature coefficients.")
@@ -64,19 +65,19 @@ class SVM_Algorithm:
                 print(f"Exception: {e}")
                 print(f"The kernel '{self.estimator.kernel}' does not support feature coefficients.")
         
-    def model_info(self):
+    def evaluation_results(self):
         print(20 * "-")
-        print(f"Accuracy: {self.accuracy} Precision: {self.precision} Recall: {self.recall} F1: {self.f1} \n"
-                f"Feature Importance: {self.feature_importance}")
+        print(f"Evaluation results of : {__name__} of {__class__}")
+        print(f"Accuracy : {self.accuracy:.4f}")
+        print(f"Precison : {self.precision:.4f}")
+        print(f"Recall : {self.recall:.4f}")
+        print(f"F1 : {self.f1:.4f}")
+        print(f"Feature Importance: {self.selected_features}")
         print(20 * "-")
         
 
 
-""" Tuned hyperparameters :(best parameters)  {'C': 0.001, 'gamma': 0.001, 'kernel': 'linear'}
-Accuracy :  1.0, Score: 1.0
-svc = SVM_Algorithm(X_train, X_test, Y_train, Y_test)
-svc.hyperparameters_score()
-
+""" 
 A Support Vector Machine (SVM) is a powerful supervised machine learning algorithm 
 that can be used for both classification and regression tasks. 
 The primary goal of an SVM is to find a hyperplane that best separates different classes in the feature space. 

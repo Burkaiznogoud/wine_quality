@@ -13,7 +13,7 @@ import prepare_file as prep
    
 # Initialization of StandardScaler object
 transform = StandardScaler()    
-data = prep.PrepareFile(file='datafiles\RedWine.csv', Y_column='Recommended', columns_to_exclude=['Quality', 'Id'])
+data = prep.PrepareFile(file='datafiles\RedWine.csv', Y_column='Recommended', columns_to_exclude=['Quality', 'Id', 'Alcohol'])
 
 Y = data.Y
 # Normalize data using StandardScaler
@@ -43,22 +43,52 @@ X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_
 #                                      )
 # cv_select_k_best.evaluation_results()
 
-### Recursive Feature Elimination ### TESTING....
-recursive_selection = rfe.RFE_Algorithm(columns= data.X_columns,
-                                        X_train = X_train, Y_train = Y_train,
-                                        X_test = X_test, Y_test = Y_test
-                                        )
-recursive_selection.evaluation_results()
-algorithm = a.Algorithm(X_train, X_test, Y_train, Y_test,
-                        estimator = recursive_selection.estimator,
-                        params = recursive_selection.parameters
-                        )
-cv_recursive_selection = rfe.RFE_Algorithm( columns= data.X_columns,
-                                            init_params = algorithm.best_params,
-                                            X_train = X_train, Y_train = Y_train,
-                                            X_test = X_test, Y_test = Y_test
-                                            )
-cv_recursive_selection.evaluation_results()
+### Recursive Feature Elimination ### TESTED and WORKS but further ivestigation is needed.
+# recursive_selection = rfe.RFE_Algorithm(columns= data.X_columns,
+#                                         X_train = X_train, Y_train = Y_train,
+#                                         X_test = X_test, Y_test = Y_test
+#                                         )
+# recursive_selection.evaluation_results()
+# algorithm = a.Algorithm(X_train, X_test, Y_train, Y_test,
+#                         estimator = recursive_selection.estimator,
+#                         params = recursive_selection.parameters
+#                         )
+# cv_recursive_selection = rfe.RFE_Algorithm( columns= data.X_columns,
+#                                             init_params = algorithm.best_params,
+#                                             X_train = X_train, Y_train = Y_train,
+#                                             X_test = X_test, Y_test = Y_test
+#                                             )
+# cv_recursive_selection.evaluation_results()
+
+### Logistic Regression ### TESTED and WORKS but further investigation is needed.
+# logistic = lr.LogisticRegression_Algorithm( columns= data.X_columns,
+#                                             X_train = X_train, Y_train = Y_train,
+#                                             X_test = X_test, Y_test = Y_test
+#                                             )
+# algorithm = a.Algorithm(X_train, X_test, Y_train, Y_test,
+#                         estimator = logistic.estimator,
+#                         params = logistic.parameters
+#                         )
+# cv_logistic = lr.LogisticRegression_Algorithm(  columns= data.X_columns,
+#                                                 X_train = X_train, Y_train = Y_train,
+#                                                 X_test = X_test, Y_test = Y_test
+#                                                 )
+
+### Decision Tree Classifier ### TESTED and WORKS. Not sure about results.
+
+# decision_tree = dt.DecisionTree_Algorithm(  columns= data.X_columns,
+#                                             X_train = X_train, Y_train = Y_train,
+#                                             X_test = X_test, Y_test = Y_test
+#                                             )
+# algorithm = a.Algorithm(X_train, X_test, Y_train, Y_test,
+#                         estimator = decision_tree.estimator,
+#                         params = decision_tree.parameters
+#                         )
+# cv_decision_tree = dt.DecisionTree_Algorithm(   columns= data.X_columns,
+#                                                 X_train = X_train, Y_train = Y_train,
+#                                                 X_test = X_test, Y_test = Y_test
+#                                                 )
+
 # svm.model_info()
 # algorithm.calculate_hyperparameters()
 # algorithm.hyperparameters_info()
