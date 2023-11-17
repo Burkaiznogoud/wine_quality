@@ -3,10 +3,11 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from sklearn.inspection import permutation_importance
 import pandas as pd
 from misc.timing import timing_decorator
+import numpy as np
 
 # Support Vector Machine
 class SVM_Algorithm:
-    def __init__(self, columns, X_train, Y_train, X_test, Y_test):
+    def __init__(self, columns, X_train, Y_train, X_test, Y_test, init_params = 'default'):
         self.parameters = { 'kernel': ['linear', 'poly'],
                             'C': [0.001, 0.01, 0.1, 1, 10],
                             'gamma':[0.001, 0.01, 0.1, 1, 10],
@@ -17,10 +18,24 @@ class SVM_Algorithm:
         self.Y_train = Y_train
         self.X_test = X_test
         self.Y_test = Y_test
-        self.estimator = SVC()
+        self.instantiate_SVC(init_params = init_params)
         self.evaluate_classification_metrics()
         self.get_feature_importance()
         self.evaluation_results()
+
+    def instantiate_SVC(self, init_params):
+        params = {'default': {  'kernel': 'linear',
+                                'C' : 1, 
+                                'gamma': 0.1, 
+                                'degree': 3, 
+                                'decision_function_shape': 'ovo'}
+                  }
+        if init_params == 'default':
+            self.estimator = SVC(**params['default'])
+            return self.estimator
+        else:
+            self.estimator = SVC(**init_params)
+            return self.estimator
 
     @timing_decorator
     def evaluate_classification_metrics(self):
@@ -54,6 +69,7 @@ class SVM_Algorithm:
                 importance_std = result.importances_std
                 importances = result.importances_mean
                 self.selected_features = pd.DataFrame({'Feature': self.columns, 'Importance': importances, "Importance_std": importance_std})
+                self.selected_features.reindex(self.selected_features['Feature'])
                 self.selected_features = self.selected_features.sort_values(by='Importance', ascending=False)
                 return self.selected_features
         except AttributeError as e:
@@ -68,6 +84,7 @@ class SVM_Algorithm:
     def evaluation_results(self):
         print(20 * "-")
         print(f"Evaluation results of : {__name__} of {__class__}")
+        print(f"Parameters used : {self.estimator.get_params} ")
         print(f"Accuracy : {self.accuracy:.4f}")
         print(f"Precison : {self.precision:.4f}")
         print(f"Recall : {self.recall:.4f}")

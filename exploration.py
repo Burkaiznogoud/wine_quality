@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-filename = "RedWine.csv"
+filename = "C:\Users\Mjedzierowski\Desktop\Data Science\Projects\wine_quality\wine_quality\datafiles\Redwine.csv"
 
 def data_basic_information(data):
     data = pd.read_csv("WineQT.csv")

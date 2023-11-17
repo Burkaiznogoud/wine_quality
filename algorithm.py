@@ -18,7 +18,7 @@ class Algorithm:
                                cv = 10, 
                                param_grid = self.parameters, 
                                scoring = self.scoring,
-                               refit = 'f1',
+                               refit = 'accuracy',
                                n_jobs = 2
                                )
         self.fit_score_predict()
@@ -28,7 +28,7 @@ class Algorithm:
     @timing_decorator
     def fit_score_predict(self):
         print(20 * "-")
-        print(f"Processing {__name__} of {__class__}")
+        print(f"Processing {__name__} of {__class__}.")
         print(20 * "-")
         self.fit = self.cv.fit(self.X, self.Y)
         self.score = self.cv.score(self.x, self.y)

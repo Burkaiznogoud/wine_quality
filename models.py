@@ -13,7 +13,7 @@ import prepare_file as prep
    
 # Initialization of StandardScaler object
 transform = StandardScaler()    
-data = prep.PrepareFile(file='datafiles\RedWine.csv', Y_column='Recommended', columns_to_exclude=['Quality', 'Id', 'Alcohol'])
+data = prep.PrepareFile(file='datafiles\RedWine.csv', Y_column='Recommended', columns_to_exclude=['Quality', 'Id'])
 
 Y = data.Y
 # Normalize data using StandardScaler
@@ -89,13 +89,22 @@ X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_
 #                                                 X_test = X_test, Y_test = Y_test
 #                                                 )
 
-# svm.model_info()
-# algorithm.calculate_hyperparameters()
-# algorithm.hyperparameters_info()
-# algorithm.plot_confusion_matrix()
 
-# print(d_tree.get_feature_importance(X, Y, columns=data.X_columns))
-# algorithm.hyperparameters_score()
-# algorithm.plot_confusion_matrix()
+### Support Vector Machine ### TESTING ...
+
+supp_vector = svm.SVM_Algorithm(columns= data.X_columns,
+                                X_train = X_train, Y_train = Y_train,
+                                X_test = X_test, Y_test = Y_test,
+                                init_params = 'default'
+                                )
+algorithm = a.Algorithm(X_train, X_test, Y_train, Y_test,
+                        estimator = supp_vector.estimator,
+                        params = supp_vector.parameters
+                        )
+cv_supp_vector = svm.SVM_Algorithm( columns= data.X_columns,
+                                    X_train = X_train, Y_train = Y_train,
+                                    X_test = X_test, Y_test = Y_test,
+                                    init_params = algorithm.best_params
+                                    )
 
 
