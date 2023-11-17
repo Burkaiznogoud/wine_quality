@@ -9,6 +9,9 @@ from algorithms import recursive_feature_elimination as rfe
 from algorithms import logistic_regression as lr
 from algorithms import decision_tree as dt
 import prepare_file as prep
+import warnings
+
+warnings.filterwarnings('ignore')
 
    
 # Initialization of StandardScaler object

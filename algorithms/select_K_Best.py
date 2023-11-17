@@ -3,11 +3,15 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import make_scorer
 from sklearn.svm import SVC
 from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error, accuracy_score, precision_score, recall_score, f1_score
+from misc.evaluation import evaluation
+from misc.timing import timing
+from misc.processing import processing
 
 
 class SKB_Algorithm:
-    def __init__(self, k, columns, X_train, Y_train, X_test, Y_test, init_params = {'kernel': 'poly', 'C': 0.1, 'gamma': 0.1, 'degree': 4, 'decision_function_shape': 'ovr'}):
-        self.parameters = { 'kernel': ['linear', 'poly'],
+    def __init__(self, k, columns, X_train, Y_train, X_test, Y_test, init_params = 'default'):
+        self.parameters =   { 
+                            'kernel': ['linear', 'poly'],
                             'C': [0.001, 0.01, 0.1, 1, 10],
                             'gamma':[0.001, 0.01, 0.1, 1, 10],
                             'degree': [3, 4 , 5],
@@ -19,24 +23,37 @@ class SKB_Algorithm:
         self.X_test = X_test
         self.Y_test = Y_test
         self.K = k
-        self.estimator = SVC(**init_params)
+        self.instantiate_SVC(init_params = init_params)
         self.calculate_Y_hat()
         self.select_features()
         self.evaluate_classification_metrics()
         self.evaluate_regression_metrics()
 
+    @processing
+    def instantiate_SVC(self, init_params):
+        params =    {  'default':   {  
+                                    'kernel': 'linear',
+                                    'C' : 1, 
+                                    'gamma': 0.1, 
+                                    'degree': 3, 
+                                    'decision_function_shape': 'ovo'
+                                    }
+                    }
+        if init_params == 'default':
+            self.estimator = SVC(**params['default'])
+            return self.estimator
+        else:
+            self.estimator = SVC(**init_params)
+            return self.estimator
+
+    @processing
     def calculate_Y_hat(self):
-        print(20 * "-")
-        print(f"Processing {__name__} of {__class__}")
-        print(20 * "-")
         self.estimator.fit(self.X_train, self.Y_train)
         self.Y_hat = self.estimator.predict(self.X_test)
         return self.Y_hat
 
+    @processing
     def select_features(self):
-        print(20 * "-")
-        print(f"Processing {__name__} of {__class__}")
-        print(20 * "-")
         skb = SelectKBest(score_func = f_classif, k = self.K)
         skb.fit(self.X_train, self.Y_train)
         selected_indices = skb.get_support(indices=True)
@@ -47,28 +64,26 @@ class SKB_Algorithm:
         print(f"Selected Features : {selected_features}")
         return self.X_train, self.X_test
     
+    @processing
     def evaluate_classification_metrics(self):
-        print(20 * "-")
-        print(f"Processing {__name__} of {__class__}")
-        print(20 * "-")
         self.accuracy = accuracy_score(self.Y_test, self.Y_hat)
         self.precision = precision_score(self.Y_test, self.Y_hat)
         self.recall = recall_score(self.Y_test, self.Y_hat)
         self.f1 = f1_score(self.Y_test, self.Y_hat)
         return self.accuracy, self.precision, self.recall, self.f1
     
+    @processing
     def evaluate_regression_metrics(self):
-        print(20 * "-")
-        print(f"Processing {__name__} of {__class__}")
-        print(20 * "-")
         self.mae = mean_absolute_error(self.Y_test, self.Y_hat)
         self.mse = mean_squared_error(self.Y_test, self.Y_hat)
         self.r2 = r2_score(self.Y_test, self.Y_hat)
         return self.mae, self.mse, self.r2
     
+    @evaluation
     def evaluation_results(self):
         print(20 * "-")
         print(f"Processing {__name__} of {__class__}")
+        print(f"Parameters used : {self.estimator.get_params} ")
         print(f"Accuracy : {self.accuracy:.4f}")
         print(f"Precison : {self.precision:.4f}")
         print(f"Recall : {self.recall:.4f}")

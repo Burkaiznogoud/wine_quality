@@ -1,18 +1,24 @@
 from sklearn.svm import SVC # Support Vector Machine algorithm
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.inspection import permutation_importance
+from sklearn.exceptions import UndefinedMetricWarning
 import pandas as pd
-from misc.timing import timing_decorator
 import numpy as np
+from misc.timing import timing
+from misc.evaluation import evaluation
+from misc.processing import processing
+
 
 # Support Vector Machine
 class SVM_Algorithm:
     def __init__(self, columns, X_train, Y_train, X_test, Y_test, init_params = 'default'):
-        self.parameters = { 'kernel': ['linear', 'poly'],
+        self.parameters =   { 
+                            'kernel': ['linear', 'poly'],
                             'C': [0.001, 0.01, 0.1, 1, 10],
                             'gamma':[0.001, 0.01, 0.1, 1, 10],
                             'degree': [3, 4 , 5],
-                            'decision_function_shape': ['ovo', 'ovr']}
+                            'decision_function_shape': ['ovo', 'ovr']
+                            }
         self.columns = columns
         self.X_train = X_train
         self.Y_train = Y_train
@@ -23,25 +29,27 @@ class SVM_Algorithm:
         self.get_feature_importance()
         self.evaluation_results()
 
+    @processing
     def instantiate_SVC(self, init_params):
-        params = {'default': {  'kernel': 'linear',
-                                'C' : 1, 
-                                'gamma': 0.1, 
-                                'degree': 3, 
-                                'decision_function_shape': 'ovo'}
+        params = {'default':{  
+                            'kernel': 'linear',
+                            'C' : 1, 
+                            'gamma': 0.1, 
+                            'degree': 3, 
+                            'decision_function_shape': 'ovo'
+                            }
                   }
         if init_params == 'default':
             self.estimator = SVC(**params['default'])
+            print(self.estimator)
             return self.estimator
         else:
             self.estimator = SVC(**init_params)
+            print(self.estimator)
             return self.estimator
 
-    @timing_decorator
+    @processing
     def evaluate_classification_metrics(self):
-        print(20 * "-")
-        print(f"Processing {__name__} of {__class__}\n evaluating classification metrics.")
-        print(20 * "-")
         self.estimator.fit(self.X_train, self.Y_train)
         Y_hat = self.estimator.predict(self.X_test)
         self.accuracy = accuracy_score(self.Y_test, Y_hat)
@@ -50,27 +58,38 @@ class SVM_Algorithm:
         self.f1 = f1_score(self.Y_test, Y_hat)
         return self.accuracy, self.precision, self.recall, self.f1
 
-    @timing_decorator
+    @processing
     def get_feature_importance(self):
-        print(20 * "-")
-        print(f"Processing {__name__} of {__class__}\n selecting features and their importances.")
-        print(20 * "-")
         self.estimator.fit(self.X_train, self.Y_train)
         if len(self.X_test) != len(self.Y_test):
             raise ValueError(f"X_test {self.X_test.shape} and Y_test {self.Y_test.shape} must have the same number of samples.")
         try:
             if self.estimator.kernel == 'linear':
                 coefficients = self.estimator.coef_[0]
-                self.selected_features = pd.DataFrame({'Feature': self.columns, 'Coefficient': coefficients})
+                self.selected_features = pd.DataFrame(
+                    {
+                    'Feature': self.columns, 
+                    'Coefficient': coefficients
+                    }
+                )
                 self.selected_features = self.selected_features.reindex(self.selected_features['Coefficient'].abs().sort_values(ascending=False).index)
                 return self.selected_features
             else:
                 result = permutation_importance(self.estimator, self.X_train, self.Y_train, n_repeats=30, random_state=4)
                 importance_std = result.importances_std
                 importances = result.importances_mean
-                self.selected_features = pd.DataFrame({'Feature': self.columns, 'Importance': importances, "Importance_std": importance_std})
+                self.selected_features = pd.DataFrame(
+                    {
+                    'Feature': self.columns, 
+                    'Importance': importances, 
+                    "Importance_std": importance_std
+                    }
+                )
                 self.selected_features.reindex(self.selected_features['Feature'])
-                self.selected_features = self.selected_features.sort_values(by='Importance', ascending=False)
+                self.selected_features = self.selected_features.sort_values(
+                                                                            by='Importance', 
+                                                                            ascending=False
+                                                                            )
                 return self.selected_features
         except AttributeError as e:
             if self.estimator.kernel == 'linear' and not hasattr(self.estimator, 'probability'):
@@ -81,16 +100,18 @@ class SVM_Algorithm:
                 print(f"Exception: {e}")
                 print(f"The kernel '{self.estimator.kernel}' does not support feature coefficients.")
         
+    @evaluation
     def evaluation_results(self):
-        print(20 * "-")
-        print(f"Evaluation results of : {__name__} of {__class__}")
-        print(f"Parameters used : {self.estimator.get_params} ")
-        print(f"Accuracy : {self.accuracy:.4f}")
-        print(f"Precison : {self.precision:.4f}")
-        print(f"Recall : {self.recall:.4f}")
-        print(f"F1 : {self.f1:.4f}")
-        print(f"Feature Importance: {self.selected_features}")
-        print(20 * "-")
+        results =   {
+                    'results': f"{__name__} of {__class__}",
+                    'parameters': f"{self.estimator.get_params}",
+                    'accuracy': f"{self.accuracy:.4f}",
+                    'precision': f"{self.precision:.4f}",
+                    'recall': f"{self.recall:.4f}",
+                    'f1': f"{self.f1:.4f}",
+                    'features': f"{self.selected_features}"
+                    }
+        return results
         
 
 

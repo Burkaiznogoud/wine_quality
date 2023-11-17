@@ -1,18 +1,22 @@
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-
+from misc.evaluation import evaluation
+from misc.timing import timing
+from misc.processing import processing
 
 class LogisticRegression_Algorithm:
-    def __init__(self, X_train, Y_train, X_test, Y_test, columns):
-        self.estimator = LogisticRegression()
-        self.parameters = {'penalty':['l2'],
-                           'C': [0.1, 1, 10],
-                           'fit_intercept': [True, False],
-                           'solver': ['lbfgs', 'newton-cg', 'liblinear', 'sag', 'saga'],
-                           'max_iter': [500, 1000],
-                           'multi_class': ['ovr', 'multinomial'],
-                           'random_state': [4, 8, 16],
-                           'tol': [1e-2, 1e-3, 1e-4]}
+    def __init__(self, X_train, Y_train, X_test, Y_test, columns, init_params = 'default'):
+        self.instantiate_LR(init_params = init_params)
+        self.parameters =   {
+                            'penalty':['l2'],
+                            'C': [0.1, 1, 10],
+                            'fit_intercept': [True, False],
+                            'solver': ['lbfgs', 'newton-cg', 'liblinear', 'sag', 'saga'],
+                            'max_iter': [500, 1000],
+                            'multi_class': ['ovr', 'multinomial'],
+                            'random_state': [4, 8, 16],
+                            'tol': [1e-2, 1e-3, 1e-4]
+                            }
         self.X_train = X_train
         self.Y_train = Y_train
         self.X_test = X_test
@@ -22,32 +26,49 @@ class LogisticRegression_Algorithm:
         self.evaluate_classification_metrics()
         self.evaluation_results()
 
+    @processing
+    def instantiate_LR(self, init_params):
+        params = {'default': {  'penalty': 'l2',
+                                'C' : 1, 
+                                'fit_intercept': True, 
+                                'solver': 'lbfgs', 
+                                'max_iter': 800,
+                                'multi_class': 'ovr',
+                                'random_state': 8,
+                                'tol': 0.1}
+                  }
+        if init_params == 'default':
+            self.estimator = LogisticRegression(**params['default'])
+            return self.estimator
+        else:
+            self.estimator = LogisticRegression(**init_params)
+            return self.estimator
+
+    @processing
     def calculate_Y_hat(self):
-        print(20 * "-")
-        print(f"Processing {__name__} of {__class__}")
-        print(20 * "-")
         self.estimator.fit(self.X_train, self.Y_train)
         self.Y_hat = self.estimator.predict(self.X_test)
         return self.Y_hat
 
+    @processing
     def evaluate_classification_metrics(self):
-        print(20 * "-")
-        print(f"Processing {__name__} of {__class__}\n evaluating classification metrics.")
-        print(20 * "-")
         self.accuracy = accuracy_score(self.Y_test, self.Y_hat)
         self.precision = precision_score(self.Y_test, self.Y_hat)
         self.recall = recall_score(self.Y_test, self.Y_hat)
         self.f1 = f1_score(self.Y_test, self.Y_hat)
         return self.accuracy, self.precision, self.recall, self.f1
     
+    @evaluation
     def evaluation_results(self):
-        print(20 * "-")
-        print(f"Evaluation results of : {__name__} of {__class__}")
-        print(f"Accuracy : {self.accuracy:.4f}")
-        print(f"Precison : {self.precision:.4f}")
-        print(f"Recall : {self.recall:.4f}")
-        print(f"F1 : {self.f1:.4f}")
-        print(20 * "-")
+        results =   {
+                    'results': f"{__name__} of {__class__}",
+                    'parameters': f"{self.estimator.get_params}",
+                    'accuracy': f"{self.accuracy:.4f}",
+                    'precision': f"{self.precision:.4f}",
+                    'recall': f"{self.recall:.4f}",
+                    'f1': f"{self.f1:.4f}",
+                    }
+        return results
 
 
 """

@@ -1,6 +1,6 @@
 import time
 
-def timing_decorator(func):
+def timing(func):
     def wrapper(*args, **kwargs):
         start_time = time.time()
         result = func(*args, **kwargs)

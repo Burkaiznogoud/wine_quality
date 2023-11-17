@@ -1,16 +1,19 @@
 from sklearn.tree import DecisionTreeClassifier # Decision Tree Classifier algorithm
 from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error, accuracy_score, precision_score, recall_score, f1_score
+from misc.evaluation import evaluation
+from misc.timing import timing
+from misc.processing import processing
 
 # Decision Tree Classifier
 class DecisionTree_Algorithm:
-    def __init__(self, X_train, Y_train, X_test, Y_test, columns):
+    def __init__(self, X_train, Y_train, X_test, Y_test, columns, init_params = 'default'):
         self.parameters = { 'criterion': ['gini', 'entropy'],
                             'splitter': ['best', 'random'],
                             'max_depth': [4, 5, 6],
                             'max_features': [None, 'sqrt', 'log2', 5, 7],
                             'min_samples_leaf': [4, 8, 16],
                             'min_samples_split': [4, 8, 16]}
-        self.estimator = DecisionTreeClassifier(ccp_alpha=0.01, random_state=4)
+        self.instantiate_DT(init_params = init_params)
         self.X_train = X_train
         self.Y_train = Y_train
         self.X_test = X_test
@@ -22,56 +25,71 @@ class DecisionTree_Algorithm:
         self.evaluate_regression_metrics()
         self.evaluation_results()
 
+    @processing
+    def instantiate_DT(self, init_params):
+        params = {'default':    {  
+                                'criterion': 'entropy',
+                                'splitter': 'random',
+                                'max_depth': 5,
+                                'max_features': 'sqrt',
+                                'min_samples_leaf': 8,
+                                'min_samples_split': 8,
+                                'ccp_alpha': 0.1,
+                                'random_state': 40
+                                }
+                }
+        if init_params == 'default':
+            self.estimator = DecisionTreeClassifier(**params['default'])
+            return self.estimator
+        else:
+            self.estimator = DecisionTreeClassifier(**init_params)
+            return self.estimator
+
+    @processing
     def calculate_Y_hat(self):
-        print(20 * "-")
-        print(f"Processing {__name__} of {__class__}\n calculating Y_hat.")
-        print(20 * "-")
         self.estimator.fit(self.X_train, self.Y_train)
         self.Y_hat = self.estimator.predict(self.X_test)
         return self.Y_hat
 
+    @processing
     def evaluate_classification_metrics(self):
-        print(20 * "-")
-        print(f"Processing {__name__} of {__class__}\n evaluating classification metrics.")
-        print(20 * "-")
         self.accuracy = accuracy_score(self.Y_test, self.Y_hat)
         self.precision = precision_score(self.Y_test, self.Y_hat)
         self.recall = recall_score(self.Y_test, self.Y_hat)
         self.f1 = f1_score(self.Y_test, self.Y_hat)
         return self.accuracy, self.precision, self.recall, self.f1
     
+    @processing
     def evaluate_regression_metrics(self):
-        print(20 * "-")
-        print(f"Processing {__name__} of {__class__}\n evaluating regression metrics.")
-        print(20 * "-")
         self.mae = mean_absolute_error(self.Y_test, self.Y_hat)
         self.mse = mean_squared_error(self.Y_test, self.Y_hat)
         self.r2 = r2_score(self.Y_test, self.Y_hat)
         return self.mae, self.mse, self.r2
 
+    @processing
     def feature_selection(self):
         self.estimator.fit(self.X_train, self.Y_train)
         feature_importances = self.estimator.feature_importances_
         feature_names = self.columns
         feature_importance_dict = dict(zip(feature_names, feature_importances))
         self.features_selected = sorted(feature_importance_dict.items(), key=lambda x: x[1], reverse=True)
-        print(20 * "-")
-        print(f"Processing {__name__} of {__class__}\n selecting features.")
-        print(f"Selected Features : {self.features_selected}")
-        print(20 * "-")
         return self.features_selected
 
+    @evaluation
     def evaluation_results(self):
-        print(20 * "-")
-        print(f"Evaluation results of : {__name__} of {__class__}")
-        print(f"Accuracy : {self.accuracy:.4f}")
-        print(f"Precison : {self.precision:.4f}")
-        print(f"Recall : {self.recall:.4f}")
-        print(f"F1 : {self.f1:.4f}")
-        print(f"Mean Absolute Error : {self.mae:.4f}")
-        print(f"Mean Squared Error : {self.mse:.4f}")
-        print(f"R2 Score : {self.r2:.4f}")
-        print(20 * "-")
+        results =   {
+                    'results': f"{__name__} of {__class__}",
+                    'parameters': f"{self.estimator.get_params}",
+                    'feature selection': f" {self.features_selected}",
+                    'accuracy': f"{self.accuracy:.4f}",
+                    'precision': f"{self.precision:.4f}",
+                    'recall': f"{self.recall:.4f}",
+                    'f1': f"{self.f1:.4f}",
+                    'mae': f"{self.mae:.4f}",
+                    'mse': f"{self.mse:.4f}",
+                    'r2': f"{self.r2:.4f}"
+                    }
+        return results
 
 """
 The Decision Tree algorithm is a popular machine learning algorithm used for both classification and regression tasks. 
