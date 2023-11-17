@@ -100,11 +100,10 @@ class SVM_Algorithm:
                 print(f"Exception: {e}")
                 print(f"The kernel '{self.estimator.kernel}' does not support feature coefficients.")
         
-    @evaluation
+    
     def evaluation_results(self):
         results =   {
                     'results': f"{__name__} of {__class__}",
-                    'parameters': f"{self.estimator.get_params}",
                     'accuracy': f"{self.accuracy:.4f}",
                     'precision': f"{self.precision:.4f}",
                     'recall': f"{self.recall:.4f}",
