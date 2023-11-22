@@ -54,14 +54,14 @@ class LogisticRegression_Algorithm:
         recall = recall_score(self.Y_train, Y_hat)
         f1 = f1_score(self.Y_train, Y_hat)
         classif_report = classification_report(self.Y_train, Y_hat)
-        self.test_report = {
+        self.train_report = {
             'test accuracy': f"{accuracy:.4f}",
             'test precision': f"{precision:.4f}",
             'test recall': f"{recall:.4f}",
             'test f1': f"{f1:.4f}",
             'test classification report': f"{classif_report}",
         }
-        return self.test_report
+        return self.train_report
 
     @processing
     def calculate_Y_hat(self):
