@@ -8,6 +8,7 @@ from algorithms import svm
 from algorithms import recursive_feature_elimination as rfe
 from algorithms import logistic_regression as lr
 from algorithms import decision_tree as dt
+from algorithms import naive_algorithm as naive
 import prepare_file as prep
 import warnings
 
@@ -25,6 +26,13 @@ X = transform.fit_transform(data.X)
 # train, test, split
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=4)
 
+### Dummy Algorithm ###
+
+n = naive.Dummy_Algorithm(  columns= data.X_columns,
+                            X_train = X_train, Y_train = Y_train,
+                            X_test = X_test, Y_test = Y_test,
+                            )
+n.plot_confusion_matrix()
 
 ### Select K Best ### TESTED and WORKS!
 # select_k_best = skb.SKB_Algorithm(  columns = data.X_columns,
@@ -95,19 +103,19 @@ X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_
 
 ### Support Vector Machine ### TESTING ...
 
-supp_vector = svm.SVM_Algorithm(columns= data.X_columns,
-                                X_train = X_train, Y_train = Y_train,
-                                X_test = X_test, Y_test = Y_test,
-                                init_params = 'default'
-                                )
-algorithm = a.Algorithm(X_train, X_test, Y_train, Y_test,
-                        estimator = supp_vector.estimator,
-                        params = supp_vector.parameters
-                        )
-cv_supp_vector = svm.SVM_Algorithm( columns= data.X_columns,
-                                    X_train = X_train, Y_train = Y_train,
-                                    X_test = X_test, Y_test = Y_test,
-                                    init_params = algorithm.best_params
-                                    )
+# supp_vector = svm.SVM_Algorithm(columns= data.X_columns,
+#                                 X_train = X_train, Y_train = Y_train,
+#                                 X_test = X_test, Y_test = Y_test,
+#                                 init_params = 'default'
+#                                 )
+# algorithm = a.Algorithm(X_train, X_test, Y_train, Y_test,
+#                         estimator = supp_vector.estimator,
+#                         params = supp_vector.parameters
+#                         )
+# cv_supp_vector = svm.SVM_Algorithm( columns= data.X_columns,
+#                                     X_train = X_train, Y_train = Y_train,
+#                                     X_test = X_test, Y_test = Y_test,
+#                                     init_params = algorithm.best_params
+#                                     )
 
 

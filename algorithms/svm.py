@@ -1,7 +1,6 @@
 from sklearn.svm import SVC # Support Vector Machine algorithm
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.inspection import permutation_importance
-from sklearn.exceptions import UndefinedMetricWarning
 import pandas as pd
 import numpy as np
 from misc.timing import timing
@@ -100,10 +99,11 @@ class SVM_Algorithm:
                 print(f"Exception: {e}")
                 print(f"The kernel '{self.estimator.kernel}' does not support feature coefficients.")
         
-    
+    @evaluation
     def evaluation_results(self):
         results =   {
                     'results': f"{__name__} of {__class__}",
+                    'parameters': f"{self.estimator.get_params}",
                     'accuracy': f"{self.accuracy:.4f}",
                     'precision': f"{self.precision:.4f}",
                     'recall': f"{self.recall:.4f}",

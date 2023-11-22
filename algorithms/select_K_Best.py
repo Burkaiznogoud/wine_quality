@@ -1,6 +1,4 @@
-from sklearn.feature_selection import SelectKBest, f_classif, mutual_info_classif, mutual_info_regression # Select K Best algorithm
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-from sklearn.metrics import make_scorer
+from sklearn.feature_selection import SelectKBest, f_classif# Select K Best algorithm
 from sklearn.svm import SVC
 from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error, accuracy_score, precision_score, recall_score, f1_score
 from misc.evaluation import evaluation
@@ -58,11 +56,10 @@ class SKB_Algorithm:
         skb.fit(self.X_train, self.Y_train)
         selected_indices = skb.get_support(indices=True)
         indices = [i for i in selected_indices]
-        selected_features = [self.columns[i] for i in selected_indices]
+        self.selected_features = [self.columns[i] for i in selected_indices]
         self.X_test = self.X_test[:, indices]
         self.X_train = self.X_train[:, indices]
-        print(f"Selected Features : {selected_features}")
-        return self.X_train, self.X_test
+        return self.X_train, self.X_test, self.selected_features
     
     @processing
     def evaluate_classification_metrics(self):
@@ -81,17 +78,19 @@ class SKB_Algorithm:
     
     @evaluation
     def evaluation_results(self):
-        print(20 * "-")
-        print(f"Processing {__name__} of {__class__}")
-        print(f"Parameters used : {self.estimator.get_params} ")
-        print(f"Accuracy : {self.accuracy:.4f}")
-        print(f"Precison : {self.precision:.4f}")
-        print(f"Recall : {self.recall:.4f}")
-        print(f"F1 : {self.f1:.4f}")
-        print(f"Mean Absolute Error : {self.mae:.4f}")
-        print(f"Mean Squared Error : {self.mse:.4f}")
-        print(f"R2 Score : {self.r2:.4f}")
-        print("-" * 20)
+        results =   {
+                    'results': f" {__name__} of {__class__}",
+                    'parameters': f" {self.estimator.get_params}",
+                    'feature selection': f" {self.selected_features}",
+                    'accuracy': f" {self.accuracy:.4f}",
+                    'precision': f" {self.precision:.4f}",
+                    'recall': f" {self.recall:.4f}",
+                    'f1': f" {self.f1:.4f}",
+                    'mae': f" {self.mae:.4f}",
+                    'mse': f" {self.mse:.4f}",
+                    'r2': f" {self.r2:.4f}"
+                    }
+        return results
     
 
 

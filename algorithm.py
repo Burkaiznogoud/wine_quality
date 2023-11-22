@@ -10,7 +10,7 @@ import warnings
 
 
 class Algorithm:
-    def __init__(self, _X_train, _X_test, _Y_train, _Y_test, params, estimator):
+    def __init__(self, X_train, X_test, Y_train, Y_test, params, estimator):
         self.parameters = params
         self.estimator = estimator
         self.scoring =  {
@@ -19,10 +19,10 @@ class Algorithm:
                         'recall': make_scorer(recall_score), 
                         'f1': make_scorer(f1_score)
                         }
-        self.X = _X_train
-        self.Y = _Y_train
-        self.x = _X_test
-        self.y = _Y_test
+        self.X_train = X_train
+        self.Y_train = Y_train
+        self.X_test = X_test
+        self.Y_test = Y_test
         self.cv = GridSearchCV(estimator = self.estimator, 
                                cv = 10, 
                                param_grid = self.parameters, 
@@ -37,9 +37,9 @@ class Algorithm:
     @processing
     def fit_score_predict(self):
         warnings.filterwarnings('ignore')
-        self.fit = self.cv.fit(self.X, self.Y)
-        self.score = self.cv.score(self.x, self.y)
-        self.Y_hat = self.cv.predict(self.x)
+        self.fit = self.cv.fit(self.X_train, self.Y_train)
+        self.score = self.cv.score(self.X_train, self.Y_train)
+        self.Y_hat = self.cv.predict(self.X_train)
         return self.fit, self.score, self.Y_hat
 
     @processing
@@ -59,7 +59,7 @@ class Algorithm:
         return results
 
     def plot_confusion_matrix(self):
-        cm = confusion_matrix(self.y, self.Y_hat)
+        cm = confusion_matrix(self.Y_test, self.Y_hat)
         ax= plt.subplot()
         sns.heatmap(cm, annot=True, ax = ax, fmt='d')
         ax.set_xlabel('Predicted labels')
