@@ -13,9 +13,11 @@ class Dummy_Algorithm:
         self.X_test = X_test
         self.Y_test = Y_test
         self.estimator = DummyClassifier(strategy='most_frequent')
+        self.train_classification_metrics()
         self.calculate_Y_hat()
         self.evaluate_classification_metrics()
         self.evaluation_results()
+        
 
     @processing
     def calculate_Y_hat(self):
@@ -23,6 +25,24 @@ class Dummy_Algorithm:
         self.Y_hat = self.estimator.predict(self.X_test)
         return self.Y_hat
 
+    @evaluation
+    def train_classification_metrics(self):
+        self.estimator.fit(self.X_train, self.Y_train)
+        Y_hat = self.estimator.predict(self.X_train)
+        accuracy = accuracy_score(self.Y_train, Y_hat)
+        precision = precision_score(self.Y_train, Y_hat)
+        recall = recall_score(self.Y_train, Y_hat)
+        f1 = f1_score(self.Y_train, Y_hat)
+        classif_report = classification_report(self.Y_train, Y_hat)
+        self.test_report = {
+            'test accuracy': f"{accuracy:.4f}",
+            'test precision': f"{precision:.4f}",
+            'test recall': f"{recall:.4f}",
+            'test f1': f"{f1:.4f}",
+            'test classification report': f"{classif_report}",
+        }
+        return self.test_report
+    
     @processing
     def evaluate_classification_metrics(self):
         self.accuracy = accuracy_score(self.Y_test, self.Y_hat)
@@ -41,7 +61,7 @@ class Dummy_Algorithm:
                     'precision': f"{self.precision:.4f}",
                     'recall': f"{self.recall:.4f}",
                     'f1': f"{self.f1:.4f}",
-                    'classification report': f"{self.classification_report:.4f}",
+                    'classification report': f"{self.classification_report}",
                     }
         return results
     
@@ -55,7 +75,4 @@ class Dummy_Algorithm:
         ax.xaxis.set_ticklabels(['Not recommended', 'Recommended']) 
         ax.yaxis.set_ticklabels(['Not recommended', 'Recommended'])
         plt.show()
-
-
-
-
+        

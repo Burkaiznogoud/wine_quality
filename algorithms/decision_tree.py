@@ -19,6 +19,7 @@ class DecisionTree_Algorithm:
         self.X_test = X_test
         self.Y_test = Y_test
         self.columns = columns
+        self.train_classification_metrics()
         self.calculate_Y_hat()
         self.feature_selection()
         self.evaluate_classification_metrics()
@@ -43,6 +44,24 @@ class DecisionTree_Algorithm:
         else:
             self.estimator = DecisionTreeClassifier(**init_params)
             return self.estimator
+
+    @evaluation
+    def train_classification_metrics(self):
+        self.estimator.fit(self.X_train, self.Y_train)
+        Y_hat = self.estimator.predict(self.X_train)
+        accuracy = accuracy_score(self.Y_train, Y_hat)
+        precision = precision_score(self.Y_train, Y_hat)
+        recall = recall_score(self.Y_train, Y_hat)
+        f1 = f1_score(self.Y_train, Y_hat)
+        classif_report = classification_report(self.Y_train, Y_hat)
+        self.test_report = {
+            'test accuracy': f"{accuracy:.4f}",
+            'test precision': f"{precision:.4f}",
+            'test recall': f"{recall:.4f}",
+            'test f1': f"{f1:.4f}",
+            'test classification report': f"{classif_report}",
+        }
+        return self.test_report
 
     @processing
     def calculate_Y_hat(self):

@@ -23,9 +23,9 @@ class SKB_Algorithm:
         self.K = k
         self.instantiate_SVC(init_params = init_params)
         self.calculate_Y_hat()
+        self.train_classification_metrics()
         self.select_features()
         self.evaluate_classification_metrics()
-        self.evaluate_regression_metrics()
 
     @processing
     def instantiate_SVC(self, init_params):
@@ -43,6 +43,24 @@ class SKB_Algorithm:
         else:
             self.estimator = SVC(**init_params)
             return self.estimator
+
+    @evaluation
+    def train_classification_metrics(self):
+        self.estimator.fit(self.X_train, self.Y_train)
+        Y_hat = self.estimator.predict(self.X_train)
+        accuracy = accuracy_score(self.Y_train, Y_hat)
+        precision = precision_score(self.Y_train, Y_hat)
+        recall = recall_score(self.Y_train, Y_hat)
+        f1 = f1_score(self.Y_train, Y_hat)
+        classif_report = classification_report(self.Y_train, Y_hat)
+        self.test_report = {
+            'test accuracy': f"{accuracy:.4f}",
+            'test precision': f"{precision:.4f}",
+            'test recall': f"{recall:.4f}",
+            'test f1': f"{f1:.4f}",
+            'test classification report': f"{classif_report}",
+        }
+        return self.test_report
 
     @processing
     def calculate_Y_hat(self):

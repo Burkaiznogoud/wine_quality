@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split # Allows us to split our data into training and testing data
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import algorithm as a
 from algorithms import select_K_Best as skb
@@ -8,10 +8,11 @@ from algorithms import svm
 from algorithms import recursive_feature_elimination as rfe
 from algorithms import logistic_regression as lr
 from algorithms import decision_tree as dt
-from algorithms import naive_algorithm as naive
+from algorithms import naive_algorithm as naive 
 import prepare_file as prep
 import warnings
 
+from sklearn.dummy import DummyClassifier
 warnings.filterwarnings('ignore')
 
    
@@ -32,8 +33,9 @@ n = naive.Dummy_Algorithm(  columns= data.X_columns,
                             X_train = X_train, Y_train = Y_train,
                             X_test = X_test, Y_test = Y_test,
                             )
-n.plot_confusion_matrix()
-print(n.classification_report)
+# n.plot_confusion_matrix()
+
+
 
 ### Select K Best ### TESTED and WORKS!
 # select_k_best = skb.SKB_Algorithm(  columns = data.X_columns,
