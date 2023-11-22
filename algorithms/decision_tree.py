@@ -1,5 +1,5 @@
 from sklearn.tree import DecisionTreeClassifier # Decision Tree Classifier algorithm
-from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error, accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
 from misc.evaluation import evaluation
 from misc.timing import timing
 from misc.processing import processing
@@ -22,7 +22,6 @@ class DecisionTree_Algorithm:
         self.calculate_Y_hat()
         self.feature_selection()
         self.evaluate_classification_metrics()
-        self.evaluate_regression_metrics()
         self.evaluation_results()
 
     @processing
@@ -57,14 +56,8 @@ class DecisionTree_Algorithm:
         self.precision = precision_score(self.Y_test, self.Y_hat)
         self.recall = recall_score(self.Y_test, self.Y_hat)
         self.f1 = f1_score(self.Y_test, self.Y_hat)
-        return self.accuracy, self.precision, self.recall, self.f1
-    
-    @processing
-    def evaluate_regression_metrics(self):
-        self.mae = mean_absolute_error(self.Y_test, self.Y_hat)
-        self.mse = mean_squared_error(self.Y_test, self.Y_hat)
-        self.r2 = r2_score(self.Y_test, self.Y_hat)
-        return self.mae, self.mse, self.r2
+        self.classification_report = classification_report(self.Y_test, self.Y_hat)
+        return self.accuracy, self.precision, self.recall, self.f1, self.classification_report
 
     @processing
     def feature_selection(self):
@@ -85,9 +78,7 @@ class DecisionTree_Algorithm:
                     'precision': f"{self.precision:.4f}",
                     'recall': f"{self.recall:.4f}",
                     'f1': f"{self.f1:.4f}",
-                    'mae': f"{self.mae:.4f}",
-                    'mse': f"{self.mse:.4f}",
-                    'r2': f"{self.r2:.4f}"
+                    'classification report': f"{self.classification_report:.4f}"
                     }
         return results
 

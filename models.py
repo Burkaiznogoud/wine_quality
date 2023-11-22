@@ -26,13 +26,14 @@ X = transform.fit_transform(data.X)
 # train, test, split
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=4)
 
-### Dummy Algorithm ###
+### Dummy Algorithm ### TESTED and WORKS!
 
 n = naive.Dummy_Algorithm(  columns= data.X_columns,
                             X_train = X_train, Y_train = Y_train,
                             X_test = X_test, Y_test = Y_test,
                             )
 n.plot_confusion_matrix()
+print(n.classification_report)
 
 ### Select K Best ### TESTED and WORKS!
 # select_k_best = skb.SKB_Algorithm(  columns = data.X_columns,
@@ -101,7 +102,7 @@ n.plot_confusion_matrix()
 #                                                 )
 
 
-### Support Vector Machine ### TESTING ...
+### Support Vector Machine ### TESTED and WORKS but zero-division error pops up! Try to handle this warning and understand its source.
 
 # supp_vector = svm.SVM_Algorithm(columns= data.X_columns,
 #                                 X_train = X_train, Y_train = Y_train,

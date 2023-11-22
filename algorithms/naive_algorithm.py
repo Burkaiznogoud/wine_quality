@@ -41,6 +41,7 @@ class Dummy_Algorithm:
                     'precision': f"{self.precision:.4f}",
                     'recall': f"{self.recall:.4f}",
                     'f1': f"{self.f1:.4f}",
+                    'classification report': f"{self.classification_report:.4f}",
                     }
         return results
     

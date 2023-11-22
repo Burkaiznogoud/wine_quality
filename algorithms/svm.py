@@ -1,5 +1,5 @@
 from sklearn.svm import SVC # Support Vector Machine algorithm
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
 from sklearn.inspection import permutation_importance
 import pandas as pd
 import numpy as np
@@ -48,14 +48,20 @@ class SVM_Algorithm:
             return self.estimator
 
     @processing
+    def calculate_Y_hat(self):
+        self.estimator.fit(self.X_train, self.Y_train)
+        self.Y_hat = self.estimator.predict(self.X_test)
+        return self.Y_hat
+    
+    @processing
     def evaluate_classification_metrics(self):
         self.estimator.fit(self.X_train, self.Y_train)
-        Y_hat = self.estimator.predict(self.X_test)
-        self.accuracy = accuracy_score(self.Y_test, Y_hat)
-        self.precision = precision_score(self.Y_test, Y_hat)
-        self.recall = recall_score(self.Y_test, Y_hat)
-        self.f1 = f1_score(self.Y_test, Y_hat)
-        return self.accuracy, self.precision, self.recall, self.f1
+        self.accuracy = accuracy_score(self.Y_test, self.Y_hat)
+        self.precision = precision_score(self.Y_test, self.Y_hat)
+        self.recall = recall_score(self.Y_test, self.Y_hat)
+        self.f1 = f1_score(self.Y_test, self.Y_hat)
+        self.classification_report = classification_report(self.Y_test, self.Y_hat)
+        return self.accuracy, self.precision, self.recall, self.f1, self.classification_report
 
     @processing
     def get_feature_importance(self):
@@ -108,7 +114,8 @@ class SVM_Algorithm:
                     'precision': f"{self.precision:.4f}",
                     'recall': f"{self.recall:.4f}",
                     'f1': f"{self.f1:.4f}",
-                    'features': f"{self.selected_features}"
+                    'features': f"{self.selected_features}",
+                    'classification report': f'{self.classification_report}'
                     }
         return results
         

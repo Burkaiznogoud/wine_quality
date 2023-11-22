@@ -1,5 +1,5 @@
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
 from misc.evaluation import evaluation
 from misc.timing import timing
 from misc.processing import processing
@@ -56,7 +56,8 @@ class LogisticRegression_Algorithm:
         self.precision = precision_score(self.Y_test, self.Y_hat)
         self.recall = recall_score(self.Y_test, self.Y_hat)
         self.f1 = f1_score(self.Y_test, self.Y_hat)
-        return self.accuracy, self.precision, self.recall, self.f1
+        self.classification_report = classification_report(self.Y_test, self.Y_hat)
+        return self.accuracy, self.precision, self.recall, self.f1, self.classification_report
     
     @evaluation
     def evaluation_results(self):
@@ -67,6 +68,7 @@ class LogisticRegression_Algorithm:
                     'precision': f"{self.precision:.4f}",
                     'recall': f"{self.recall:.4f}",
                     'f1': f"{self.f1:.4f}",
+                    'classification report': f"{self.classification_report:.4f}"
                     }
         return results
 
