@@ -8,7 +8,8 @@ from algorithms import svm
 from algorithms import recursive_feature_elimination as rfe
 from algorithms import logistic_regression as lr
 from algorithms import decision_tree as dt
-from algorithms import naive_algorithm as naive 
+from algorithms import naive_algorithm as naive
+from algorithms import algorithm as parent
 import prepare_file as prep
 import warnings
 
@@ -27,12 +28,22 @@ X = transform.fit_transform(data.X)
 # train, test, split
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=4)
 
+### Parent Algorithm Class instance ###
+
+p = parent.Algorithm(   
+                    columns= data.X_columns,
+                    X_train = X_train, Y_train = Y_train,
+                    X_test = X_test, Y_test = Y_test
+                    )
+
 ### Dummy Algorithm ### TESTED and WORKS!
 
-n = naive.Dummy_Algorithm(  columns= data.X_columns,
-                            X_train = X_train, Y_train = Y_train,
-                            X_test = X_test, Y_test = Y_test,
-                            )
+n = naive.Dummy_Algorithm(
+                        columns= data.X_columns,
+                        X_train = X_train, Y_train = Y_train,
+                        X_test = X_test, Y_test = Y_test
+                        )       
+
 # n.plot_confusion_matrix()
 
 

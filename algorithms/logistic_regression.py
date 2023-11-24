@@ -1,12 +1,10 @@
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
-from misc.evaluation import evaluation
-from misc.timing import timing
+from algorithms.algorithm import Algorithm
 from misc.processing import processing
 
-class LogisticRegression_Algorithm:
+class LogisticRegression_Algorithm(Algorithm):
     def __init__(self, X_train, Y_train, X_test, Y_test, columns, init_params = 'default'):
-        self.instantiate_LR(init_params = init_params)
+        Algorithm.__init__(X_train, Y_train, X_test, Y_test, columns)
         self.parameters =   {
                             'penalty':['l2'],
                             'C': [0.1, 1, 10],
@@ -17,11 +15,7 @@ class LogisticRegression_Algorithm:
                             'random_state': [4, 8, 16],
                             'tol': [1e-2, 1e-3, 1e-4]
                             }
-        self.X_train = X_train
-        self.Y_train = Y_train
-        self.X_test = X_test
-        self.Y_test = Y_test
-        self.columns = columns
+        self.instantiate_LR(init_params = init_params)
         self.train_classification_metrics()
         self.calculate_Y_hat()
         self.evaluate_classification_metrics()
@@ -44,54 +38,7 @@ class LogisticRegression_Algorithm:
         else:
             self.estimator = LogisticRegression(**init_params)
             return self.estimator
-
-    @evaluation
-    def train_classification_metrics(self):
-        self.estimator.fit(self.X_train, self.Y_train)
-        Y_hat = self.estimator.predict(self.X_train)
-        accuracy = accuracy_score(self.Y_train, Y_hat)
-        precision = precision_score(self.Y_train, Y_hat)
-        recall = recall_score(self.Y_train, Y_hat)
-        f1 = f1_score(self.Y_train, Y_hat)
-        classif_report = classification_report(self.Y_train, Y_hat)
-        self.train_report = {
-            'test accuracy': f"{accuracy:.4f}",
-            'test precision': f"{precision:.4f}",
-            'test recall': f"{recall:.4f}",
-            'test f1': f"{f1:.4f}",
-            'test classification report': f"{classif_report}",
-        }
-        return self.train_report
-
-    @processing
-    def calculate_Y_hat(self):
-        self.estimator.fit(self.X_train, self.Y_train)
-        self.Y_hat = self.estimator.predict(self.X_test)
-        return self.Y_hat
-
-    @processing
-    def evaluate_classification_metrics(self):
-        self.accuracy = accuracy_score(self.Y_test, self.Y_hat)
-        self.precision = precision_score(self.Y_test, self.Y_hat)
-        self.recall = recall_score(self.Y_test, self.Y_hat)
-        self.f1 = f1_score(self.Y_test, self.Y_hat)
-        self.classification_report = classification_report(self.Y_test, self.Y_hat)
-        return self.accuracy, self.precision, self.recall, self.f1, self.classification_report
-    
-    @evaluation
-    def evaluation_results(self):
-        results =   {
-                    'results': f"{__name__} of {__class__}",
-                    'parameters': f"{self.estimator.get_params}",
-                    'accuracy': f"{self.accuracy:.4f}",
-                    'precision': f"{self.precision:.4f}",
-                    'recall': f"{self.recall:.4f}",
-                    'f1': f"{self.f1:.4f}",
-                    'classification report': f"{self.classification_report:.4f}"
-                    }
-        return results
-
-
+        
 """
 Logistic Regression Algorithm:
 Logistic Regression is a binary classification algorithm

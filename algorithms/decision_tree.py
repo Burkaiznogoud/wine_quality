@@ -1,12 +1,12 @@
-from sklearn.tree import DecisionTreeClassifier # Decision Tree Classifier algorithm
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+from sklearn.tree import DecisionTreeClassifier
+from algorithms.algorithm import Algorithm
 from misc.evaluation import evaluation
-from misc.timing import timing
 from misc.processing import processing
 
 # Decision Tree Classifier
-class DecisionTree_Algorithm:
+class DecisionTree_Algorithm(Algorithm):
     def __init__(self, X_train, Y_train, X_test, Y_test, columns, init_params = 'default'):
+        Algorithm.__init__(self, X_train, Y_train, X_test, Y_test, columns)
         self.parameters = { 'criterion': ['gini', 'entropy'],
                             'splitter': ['best', 'random'],
                             'max_depth': [4, 5, 6],
@@ -14,11 +14,6 @@ class DecisionTree_Algorithm:
                             'min_samples_leaf': [4, 8, 16],
                             'min_samples_split': [4, 8, 16]}
         self.instantiate_DT(init_params = init_params)
-        self.X_train = X_train
-        self.Y_train = Y_train
-        self.X_test = X_test
-        self.Y_test = Y_test
-        self.columns = columns
         self.train_classification_metrics()
         self.calculate_Y_hat()
         self.feature_selection()
@@ -44,39 +39,6 @@ class DecisionTree_Algorithm:
         else:
             self.estimator = DecisionTreeClassifier(**init_params)
             return self.estimator
-
-    @evaluation
-    def train_classification_metrics(self):
-        self.estimator.fit(self.X_train, self.Y_train)
-        Y_hat = self.estimator.predict(self.X_train)
-        accuracy = accuracy_score(self.Y_train, Y_hat)
-        precision = precision_score(self.Y_train, Y_hat)
-        recall = recall_score(self.Y_train, Y_hat)
-        f1 = f1_score(self.Y_train, Y_hat)
-        classif_report = classification_report(self.Y_train, Y_hat)
-        self.train_report = {
-            'test accuracy': f"{accuracy:.4f}",
-            'test precision': f"{precision:.4f}",
-            'test recall': f"{recall:.4f}",
-            'test f1': f"{f1:.4f}",
-            'test classification report': f"{classif_report}",
-        }
-        return self.train_report
-
-    @processing
-    def calculate_Y_hat(self):
-        self.estimator.fit(self.X_train, self.Y_train)
-        self.Y_hat = self.estimator.predict(self.X_test)
-        return self.Y_hat
-
-    @processing
-    def evaluate_classification_metrics(self):
-        self.accuracy = accuracy_score(self.Y_test, self.Y_hat)
-        self.precision = precision_score(self.Y_test, self.Y_hat)
-        self.recall = recall_score(self.Y_test, self.Y_hat)
-        self.f1 = f1_score(self.Y_test, self.Y_hat)
-        self.classification_report = classification_report(self.Y_test, self.Y_hat)
-        return self.accuracy, self.precision, self.recall, self.f1, self.classification_report
 
     @processing
     def feature_selection(self):

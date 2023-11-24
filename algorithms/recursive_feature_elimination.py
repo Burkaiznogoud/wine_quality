@@ -1,21 +1,16 @@
-from sklearn.feature_selection import RFE # Recursie Feature Elimination algorithm
+from sklearn.feature_selection import RFE
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+from algorithms.algorithm import Algorithm
 from misc.evaluation import evaluation
-from misc.timing import timing
 from misc.processing import processing
 
 # Recursive Feature Elimination
-class RFE_Algorithm:
+class RFE_Algorithm(Algorithm):
     def __init__(self, columns, X_train, Y_train, X_test, Y_test, init_params = 'default'):
+        Algorithm.__init__(self, columns, X_train, Y_train, X_test, Y_test)
         self.parameters =   {
                             'n_features_to_select': [2, 4, 6], 'step': [2, 3, 4]
                             }
-        self.columns = columns
-        self.X_train = X_train
-        self.Y_train = Y_train
-        self.X_test = X_test
-        self.Y_test = Y_test
         self.instantiate_LR()
         self.calculate_Y_hat()
         self.instantiate_RFE(init_params = init_params)
@@ -42,24 +37,6 @@ class RFE_Algorithm:
         self.lr = LogisticRegression(**init_params)
         return self.lr
 
-    @evaluation
-    def train_classification_metrics(self):
-        self.estimator.fit(self.X_train, self.Y_train)
-        Y_hat = self.estimator.predict(self.X_train)
-        accuracy = accuracy_score(self.Y_train, Y_hat)
-        precision = precision_score(self.Y_train, Y_hat)
-        recall = recall_score(self.Y_train, Y_hat)
-        f1 = f1_score(self.Y_train, Y_hat)
-        classif_report = classification_report(self.Y_train, Y_hat)
-        self.train_report = {
-            'test accuracy': f"{accuracy:.4f}",
-            'test precision': f"{precision:.4f}",
-            'test recall': f"{recall:.4f}",
-            'test f1': f"{f1:.4f}",
-            'test classification report': f"{classif_report}",
-        }
-        return self.train_report
-
     @processing
     def calculate_Y_hat(self):
         self.lr.fit(self.X_train, self.Y_train)
@@ -75,15 +52,6 @@ class RFE_Algorithm:
         self.X_train = self.X_train[:, indices]
         self.X_test = self.X_test[:, indices]
         return self.estimator.ranking_, self.selected_features, self.X_train, self.X_test, self.estimator
-
-    @processing
-    def evaluate_classification_metrics(self):
-        self.accuracy = accuracy_score(self.Y_test, self.Y_hat)
-        self.precision = precision_score(self.Y_test, self.Y_hat)
-        self.recall = recall_score(self.Y_test, self.Y_hat)
-        self.f1 = f1_score(self.Y_test, self.Y_hat)
-        self.classification_report = classification_report(self.Y_test, self.Y_hat)
-        return self.accuracy, self.precision, self.recall, self.f1
     
     @evaluation
     def evaluation_results(self):

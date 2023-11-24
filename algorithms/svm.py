@@ -1,16 +1,13 @@
-from sklearn.svm import SVC # Support Vector Machine algorithm
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+from sklearn.svm import SVC
 from sklearn.inspection import permutation_importance
+from algorithms.algorithm import Algorithm
 import pandas as pd
-import numpy as np
-from misc.timing import timing
-from misc.evaluation import evaluation
 from misc.processing import processing
 
 
-# Support Vector Machine
-class SVM_Algorithm:
+class SVM_Algorithm(Algorithm):
     def __init__(self, columns, X_train, Y_train, X_test, Y_test, init_params = 'default'):
+        Algorithm.__init__(columns, X_train, Y_train, X_test, Y_test)
         self.parameters =   { 
                             'kernel': ['linear', 'poly'],
                             'C': [0.001, 0.01, 0.1, 1, 10],
@@ -18,13 +15,9 @@ class SVM_Algorithm:
                             'degree': [3, 4 , 5],
                             'decision_function_shape': ['ovo', 'ovr']
                             }
-        self.columns = columns
-        self.X_train = X_train
-        self.Y_train = Y_train
-        self.X_test = X_test
-        self.Y_test = Y_test
         self.instantiate_SVC(init_params = init_params)
         self.train_classification_metrics()
+        self.calculate_Y_hat()
         self.evaluate_classification_metrics()
         self.get_feature_importance()
         self.evaluation_results()
@@ -47,40 +40,6 @@ class SVM_Algorithm:
             self.estimator = SVC(**init_params)
             print(self.estimator)
             return self.estimator
-
-    @evaluation
-    def train_classification_metrics(self):
-        self.estimator.fit(self.X_train, self.Y_train)
-        Y_hat = self.estimator.predict(self.X_train)
-        accuracy = accuracy_score(self.Y_train, Y_hat)
-        precision = precision_score(self.Y_train, Y_hat)
-        recall = recall_score(self.Y_train, Y_hat)
-        f1 = f1_score(self.Y_train, Y_hat)
-        classif_report = classification_report(self.Y_train, Y_hat)
-        self.train_report = {
-            'test accuracy': f"{accuracy:.4f}",
-            'test precision': f"{precision:.4f}",
-            'test recall': f"{recall:.4f}",
-            'test f1': f"{f1:.4f}",
-            'test classification report': f"{classif_report}",
-        }
-        return self.train_report
-
-    @processing
-    def calculate_Y_hat(self):
-        self.estimator.fit(self.X_train, self.Y_train)
-        self.Y_hat = self.estimator.predict(self.X_test)
-        return self.Y_hat
-    
-    @processing
-    def evaluate_classification_metrics(self):
-        self.estimator.fit(self.X_train, self.Y_train)
-        self.accuracy = accuracy_score(self.Y_test, self.Y_hat)
-        self.precision = precision_score(self.Y_test, self.Y_hat)
-        self.recall = recall_score(self.Y_test, self.Y_hat)
-        self.f1 = f1_score(self.Y_test, self.Y_hat)
-        self.classification_report = classification_report(self.Y_test, self.Y_hat)
-        return self.accuracy, self.precision, self.recall, self.f1, self.classification_report
 
     @processing
     def get_feature_importance(self):
@@ -124,21 +83,6 @@ class SVM_Algorithm:
                 print(f"Exception: {e}")
                 print(f"The kernel '{self.estimator.kernel}' does not support feature coefficients.")
         
-    @evaluation
-    def evaluation_results(self):
-        results =   {
-                    'results': f"{__name__} of {__class__}",
-                    'parameters': f"{self.estimator.get_params}",
-                    'accuracy': f"{self.accuracy:.4f}",
-                    'precision': f"{self.precision:.4f}",
-                    'recall': f"{self.recall:.4f}",
-                    'f1': f"{self.f1:.4f}",
-                    'features': f"{self.selected_features}",
-                    'classification report': f'{self.classification_report}'
-                    }
-        return results
-        
-
 
 """ 
 A Support Vector Machine (SVM) is a powerful supervised machine learning algorithm 

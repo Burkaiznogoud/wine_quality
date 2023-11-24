@@ -1,13 +1,13 @@
-from sklearn.feature_selection import SelectKBest, f_classif# Select K Best algorithm
+from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+from algorithms.algorithm import Algorithm
 from misc.evaluation import evaluation
-from misc.timing import timing
 from misc.processing import processing
 
 
-class SKB_Algorithm:
+class SKB_Algorithm(Algorithm):
     def __init__(self, k, columns, X_train, Y_train, X_test, Y_test, init_params = 'default'):
+        Algorithm.__init__(columns, X_train, Y_train, X_test, Y_test)
         self.parameters =   { 
                             'kernel': ['linear', 'poly'],
                             'C': [0.001, 0.01, 0.1, 1, 10],
@@ -15,15 +15,10 @@ class SKB_Algorithm:
                             'degree': [3, 4 , 5],
                             'decision_function_shape': ['ovo', 'ovr']
                             }
-        self.columns = columns
-        self.X_train = X_train
-        self.Y_train = Y_train
-        self.X_test = X_test
-        self.Y_test = Y_test
         self.K = k
         self.instantiate_SVC(init_params = init_params)
-        self.calculate_Y_hat()
         self.train_classification_metrics()
+        self.calculate_Y_hat()
         self.select_features()
         self.evaluate_classification_metrics()
 
@@ -44,30 +39,6 @@ class SKB_Algorithm:
             self.estimator = SVC(**init_params)
             return self.estimator
 
-    @evaluation
-    def train_classification_metrics(self):
-        self.estimator.fit(self.X_train, self.Y_train)
-        Y_hat = self.estimator.predict(self.X_train)
-        accuracy = accuracy_score(self.Y_train, Y_hat)
-        precision = precision_score(self.Y_train, Y_hat)
-        recall = recall_score(self.Y_train, Y_hat)
-        f1 = f1_score(self.Y_train, Y_hat)
-        classif_report = classification_report(self.Y_train, Y_hat)
-        self.train_report = {
-            'test accuracy': f"{accuracy:.4f}",
-            'test precision': f"{precision:.4f}",
-            'test recall': f"{recall:.4f}",
-            'test f1': f"{f1:.4f}",
-            'test classification report': f"{classif_report}",
-        }
-        return self.train_report
-
-    @processing
-    def calculate_Y_hat(self):
-        self.estimator.fit(self.X_train, self.Y_train)
-        self.Y_hat = self.estimator.predict(self.X_test)
-        return self.Y_hat
-
     @processing
     def select_features(self):
         skb = SelectKBest(score_func = f_classif, k = self.K)
@@ -78,15 +49,6 @@ class SKB_Algorithm:
         self.X_test = self.X_test[:, indices]
         self.X_train = self.X_train[:, indices]
         return self.X_train, self.X_test, self.selected_features
-    
-    @processing
-    def evaluate_classification_metrics(self):
-        self.accuracy = accuracy_score(self.Y_test, self.Y_hat)
-        self.precision = precision_score(self.Y_test, self.Y_hat)
-        self.recall = recall_score(self.Y_test, self.Y_hat)
-        self.f1 = f1_score(self.Y_test, self.Y_hat)
-        self.classification_report = classification_report(self.Y_test, self.Y_hat)
-        return self.accuracy, self.precision, self.recall, self.f1, self.classification_report
     
     @evaluation
     def evaluation_results(self):
