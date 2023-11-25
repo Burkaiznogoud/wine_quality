@@ -3,8 +3,9 @@ from algorithms.algorithm import Algorithm
 from misc.processing import processing
 
 class LogisticRegression_Algorithm(Algorithm):
-    def __init__(self, X_train, Y_train, X_test, Y_test, columns, init_params = 'default'):
-        Algorithm.__init__(X_train, Y_train, X_test, Y_test, columns)
+    def __init__(self, init_params = 'default'):
+        Algorithm.__init__
+        self.assign_data()
         self.parameters =   {
                             'penalty':['l2'],
                             'C': [0.1, 1, 10],
@@ -19,7 +20,8 @@ class LogisticRegression_Algorithm(Algorithm):
         self.train_classification_metrics()
         self.calculate_Y_hat()
         self.evaluate_classification_metrics()
-        self.evaluation_results()
+        self.results_()
+        self.show_results()
 
     @processing
     def instantiate_LR(self, init_params):

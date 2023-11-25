@@ -6,8 +6,9 @@ from misc.processing import processing
 
 
 class SKB_Algorithm(Algorithm):
-    def __init__(self, k, columns, X_train, Y_train, X_test, Y_test, init_params = 'default'):
-        Algorithm.__init__(columns, X_train, Y_train, X_test, Y_test)
+    def __init__(self, k = 3 ,init_params = 'default'):
+        Algorithm.__init__
+        self.assign_data()
         self.parameters =   { 
                             'kernel': ['linear', 'poly'],
                             'C': [0.001, 0.01, 0.1, 1, 10],
@@ -19,8 +20,11 @@ class SKB_Algorithm(Algorithm):
         self.instantiate_SVC(init_params = init_params)
         self.train_classification_metrics()
         self.calculate_Y_hat()
-        self.select_features()
         self.evaluate_classification_metrics()
+        self.results_()
+        self.select_features()
+        self.show_results()
+        
 
     @processing
     def instantiate_SVC(self, init_params):
@@ -48,23 +52,14 @@ class SKB_Algorithm(Algorithm):
         self.selected_features = [self.columns[i] for i in selected_indices]
         self.X_test = self.X_test[:, indices]
         self.X_train = self.X_train[:, indices]
+        update_results = {'feature selection': f" {self.selected_features}"}
+        self.results.update(update_results)
         return self.X_train, self.X_test, self.selected_features
     
     @evaluation
-    def evaluation_results(self):
-        results =   {
-                    'results': f" {__name__} of {__class__}",
-                    'parameters': f" {self.estimator.get_params}",
-                    'feature selection': f" {self.selected_features}",
-                    'accuracy': f" {self.accuracy:.4f}",
-                    'precision': f" {self.precision:.4f}",
-                    'recall': f" {self.recall:.4f}",
-                    'f1': f" {self.f1:.4f}",
-                    'classification report': f"{self.classification_report:.4f}"
-                    }
-        return results
+    def show_results(self):
+        return self.results
     
-
 
 """
 The SelectKBest algorithm is a feature selection method in machine learning

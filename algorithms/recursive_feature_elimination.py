@@ -6,8 +6,9 @@ from misc.processing import processing
 
 # Recursive Feature Elimination
 class RFE_Algorithm(Algorithm):
-    def __init__(self, columns, X_train, Y_train, X_test, Y_test, init_params = 'default'):
-        Algorithm.__init__(self, columns, X_train, Y_train, X_test, Y_test)
+    def __init__(self, init_params = 'default'):
+        Algorithm.__init__
+        self.assign_data()
         self.parameters =   {
                             'n_features_to_select': [2, 4, 6], 'step': [2, 3, 4]
                             }
@@ -15,10 +16,23 @@ class RFE_Algorithm(Algorithm):
         self.calculate_Y_hat()
         self.instantiate_RFE(init_params = init_params)
         self.train_classification_metrics()
-        self.feature_selection()
         self.evaluate_classification_metrics()
-        self.evaluation_results()
+        self.results_()
+        self.feature_selection()
+        self.show_results()
 
+    @processing
+    def instantiate_LR(self):
+        init_params = {"C": 0.1,'penalty': 'l2', 'solver': 'lbfgs'}
+        self.lr = LogisticRegression(**init_params)
+        return self.lr
+
+    @processing
+    def calculate_Y_hat(self):
+        self.lr.fit(self.X_train, self.Y_train)
+        self.Y_hat = self.lr.predict(self.X_test)
+        return self.Y_hat, self.lr
+    
     @processing
     def instantiate_RFE(self, init_params):
         params =    {  
@@ -32,18 +46,6 @@ class RFE_Algorithm(Algorithm):
             return self.estimator
     
     @processing
-    def instantiate_LR(self):
-        init_params = {"C": 0.1,'penalty': 'l2', 'solver': 'lbfgs'}
-        self.lr = LogisticRegression(**init_params)
-        return self.lr
-
-    @processing
-    def calculate_Y_hat(self):
-        self.lr.fit(self.X_train, self.Y_train)
-        self.Y_hat = self.lr.predict(self.X_test)
-        return self.Y_hat, self.lr
-
-    @processing
     def feature_selection(self):
         self.estimator.fit(self.X_train, self.Y_train)
         features = {feature: i for i, feature in enumerate(self.columns) if self.estimator.support_[i]}
@@ -51,22 +53,13 @@ class RFE_Algorithm(Algorithm):
         self.selected_features = {k: v for k, v in sorted(features.items(), key = lambda item: item[1], reverse = True)}
         self.X_train = self.X_train[:, indices]
         self.X_test = self.X_test[:, indices]
+        update_results = {'feature ranking': f" {self.estimator.ranking_}", 'feature selection': f" {self.selected_features}"}
+        self.results.update(update_results)
         return self.estimator.ranking_, self.selected_features, self.X_train, self.X_test, self.estimator
     
     @evaluation
-    def evaluation_results(self):
-        results =   {
-                    'results': f" {__name__} of {__class__}",
-                    'parameters': f" {self.estimator.get_params}",
-                    'feature ranking': f" {self.estimator.ranking_}",
-                    'feature selection': f" {self.selected_features}",
-                    'accuracy': f" {self.accuracy:.4f}",
-                    'precision': f" {self.precision:.4f}",
-                    'recall': f" {self.recall:.4f}",
-                    'f1': f" {self.f1:.4f}",
-                    'classification report': f"{self.classification_report:.4f}"
-                    }
-        return results
+    def show_results(self):
+        return self.results
 
 """
 Recursive Feature Elimination (RFE) is a feature selection algorithm used in machine learning

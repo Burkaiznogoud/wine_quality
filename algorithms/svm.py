@@ -6,8 +6,9 @@ from misc.processing import processing
 
 
 class SVM_Algorithm(Algorithm):
-    def __init__(self, columns, X_train, Y_train, X_test, Y_test, init_params = 'default'):
-        Algorithm.__init__(columns, X_train, Y_train, X_test, Y_test)
+    def __init__(self, init_params = 'default'):
+        Algorithm.__init__
+        self.assign_data()
         self.parameters =   { 
                             'kernel': ['linear', 'poly'],
                             'C': [0.001, 0.01, 0.1, 1, 10],
@@ -20,7 +21,8 @@ class SVM_Algorithm(Algorithm):
         self.calculate_Y_hat()
         self.evaluate_classification_metrics()
         self.get_feature_importance()
-        self.evaluation_results()
+        self.results_()
+        self.show_results()
 
     @processing
     def instantiate_SVC(self, init_params):
@@ -56,7 +58,9 @@ class SVM_Algorithm(Algorithm):
                     }
                 )
                 self.selected_features = self.selected_features.reindex(self.selected_features['Coefficient'].abs().sort_values(ascending=False).index)
-                return self.selected_features
+                update_results = {'feature selection': f" {self.selected_features}"}
+                self.results.update(update_results)
+                return
             else:
                 result = permutation_importance(self.estimator, self.X_train, self.Y_train, n_repeats=30, random_state=4)
                 importance_std = result.importances_std
@@ -73,7 +77,9 @@ class SVM_Algorithm(Algorithm):
                                                                             by='Importance', 
                                                                             ascending=False
                                                                             )
-                return self.selected_features
+                update_results = {'feature selection': f" {self.selected_features}"}
+                self.results.update(update_results)
+                return
         except AttributeError as e:
             if self.estimator.kernel == 'linear' and not hasattr(self.estimator, 'probability'):
                 print(f"The kernel '{self.estimator.kernel}' does not support feature coefficients.")

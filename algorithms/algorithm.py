@@ -2,21 +2,19 @@ from sklearn.metrics import accuracy_score, classification_report, accuracy_scor
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import prepare_file as prep
 import seaborn as sns
 from misc.processing import processing
 from misc.evaluation import evaluation
+from prepare_file import Data
 
 class Algorithm:
-    def __init__(self, columns, X_train, Y_train, X_test, Y_test):
-        self.columns = columns
-        self.X_train = X_train
-        self.Y_train = Y_train
-        self.X_test = X_test
-        self.Y_test = Y_test
-
+    f = Data()
+        
     @processing
-    def instantiate_estimator(self):
-        pass
+    def assign_data(self):
+        self.X_train, self.X_test, self.Y_train, self.Y_test, self.columns = self.f.data
+        return self.X_train, self.X_test, self.Y_train, self.Y_test, self.columns
 
     @processing
     def calculate_Y_hat(self):
@@ -51,9 +49,9 @@ class Algorithm:
         self.classification_report = classification_report(self.Y_test, self.Y_hat)
         return self.accuracy, self.precision, self.recall, self.f1, self.classification_report
     
-    @evaluation
-    def evaluation_results(self):
-        results =   {
+    @processing
+    def results_(self):
+        self.results =   {
                     'results': f"{__name__} of {__class__}",
                     'parameters': f"{self.estimator.get_params}",
                     'accuracy': f"{self.accuracy:.4f}",
@@ -62,7 +60,11 @@ class Algorithm:
                     'f1': f"{self.f1:.4f}",
                     'classification report': f"{self.classification_report}",
                     }
-        return results
+        return self.results
+    
+    @evaluation
+    def show_results(self):
+        return self.results
     
     def plot_confusion_matrix(self):
         cm = confusion_matrix(self.Y_test, self.Y_hat)

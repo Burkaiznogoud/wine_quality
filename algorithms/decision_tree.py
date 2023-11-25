@@ -5,8 +5,9 @@ from misc.processing import processing
 
 # Decision Tree Classifier
 class DecisionTree_Algorithm(Algorithm):
-    def __init__(self, X_train, Y_train, X_test, Y_test, columns, init_params = 'default'):
-        Algorithm.__init__(self, X_train, Y_train, X_test, Y_test, columns)
+    def __init__(self, init_params = 'default'):
+        Algorithm.__init__
+        self.assign_data()
         self.parameters = { 'criterion': ['gini', 'entropy'],
                             'splitter': ['best', 'random'],
                             'max_depth': [4, 5, 6],
@@ -18,7 +19,8 @@ class DecisionTree_Algorithm(Algorithm):
         self.calculate_Y_hat()
         self.feature_selection()
         self.evaluate_classification_metrics()
-        self.evaluation_results()
+        self.results_()
+        self.show_results()
 
     @processing
     def instantiate_DT(self, init_params):
@@ -46,22 +48,11 @@ class DecisionTree_Algorithm(Algorithm):
         feature_importances = self.estimator.feature_importances_
         feature_names = self.columns
         feature_importance_dict = dict(zip(feature_names, feature_importances))
-        self.features_selected = sorted(feature_importance_dict.items(), key=lambda x: x[1], reverse=True)
-        return self.features_selected
+        self.selected_features = sorted(feature_importance_dict.items(), key=lambda x: x[1], reverse=True)
+        update_results = {'feature selection': f" {self.selected_features}"}
+        self.results.update(update_results)
+        return self.selected_features
 
-    @evaluation
-    def evaluation_results(self):
-        results =   {
-                    'results': f"{__name__} of {__class__}",
-                    'parameters': f"{self.estimator.get_params}",
-                    'feature selection': f" {self.features_selected}",
-                    'accuracy': f"{self.accuracy:.4f}",
-                    'precision': f"{self.precision:.4f}",
-                    'recall': f"{self.recall:.4f}",
-                    'f1': f"{self.f1:.4f}",
-                    'classification report': f"{self.classification_report:.4f}"
-                    }
-        return results
 
 """
 The Decision Tree algorithm is a popular machine learning algorithm used for both classification and regression tasks. 
