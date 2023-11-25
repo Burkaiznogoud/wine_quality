@@ -7,8 +7,8 @@ class PrepareFile:
     def __init__(self, file, Y_column, columns_to_exclude=None):
         self.exclude = columns_to_exclude
         self.options(file)
-        self.prepare_X(columns_to_exclude)
         self.prepare_Y(Y_column)
+        self.prepare_X(columns_to_exclude)
         self.Y_column = Y_column
         self.X_columns = [col for col in self.file.columns if col != self.Y_column and col not in self.exclude]
 
@@ -28,7 +28,7 @@ class PrepareFile:
         Y = self.file[Y_column]
         Y = Y.replace({True: np.float64(1), False: np.float64(0)})
         self.Y = Y.to_numpy()
-        self.file = self.file.drop(Y_column, axis=1)
+        self.file.drop(Y_column, axis=1, inplace=True)
         self.file.set_index('Id', inplace=True)
         return self.Y
 
@@ -37,15 +37,13 @@ class PrepareFile:
             print(20 * "-")
             print(f"No columns were excluded. Left dataframe is being converted to numpy array.")
             print(20 * "-")
-            X = self.file.reset_index(drop=True)
-            X.set_index(X.columns[0], inplace=True)
+            X = self.file
             self.X = X.to_numpy()
         else:
             print(20 * "-")
             print(f"Columns {columns_to_exclude} were excluded. Left dataframe is being converted to numpy array.")
             print(20 * "-")
             X = self.file.drop(columns_to_exclude, axis=1).reset_index(drop=True)
-            X.set_index(X.columns[0], inplace=True)
             self.X = X.to_numpy()
         return self.X
     
@@ -55,7 +53,7 @@ class Data:
         self.prepare_data()
 
     def prepare_data(self):
-        data = PrepareFile(file='.\datafiles\Redwine.csv', Y_column='Recommended', columns_to_exclude=['Quality', 'Id'])
+        data = PrepareFile(file='.\datafiles\Redwine.csv', Y_column='Recommended', columns_to_exclude=['Quality'])
         Y = data.Y
         X = data.X
         columns = data.X_columns

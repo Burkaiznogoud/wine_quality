@@ -1,7 +1,7 @@
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier, plot_tree
 from algorithms.algorithm import Algorithm
-from misc.evaluation import evaluation
 from misc.processing import processing
+import matplotlib.pyplot as plt
 
 # Decision Tree Classifier
 class DecisionTree_Algorithm(Algorithm):
@@ -48,10 +48,25 @@ class DecisionTree_Algorithm(Algorithm):
         feature_importances = self.estimator.feature_importances_
         feature_names = self.columns
         feature_importance_dict = dict(zip(feature_names, feature_importances))
-        self.selected_features = sorted(feature_importance_dict.items(), key=lambda x: x[1], reverse=True)
+        self.selected_features = sorted(
+                                        feature_importance_dict.items(), 
+                                        key=lambda x: x[1], 
+                                        reverse=True
+                                        )
         update_results = {'feature selection': f" {self.selected_features}"}
         self.results.update(update_results)
         return self.selected_features
+    
+    def plot_decision_tree(self):
+        plt.figure(figsize=(10, 7))
+        plot_tree(
+                decision_tree=self.estimator, 
+                feature_names=self.columns, 
+                class_names=['Recommended', 'Not Recommended'], 
+                filled=True, 
+                rounded=True
+                )
+        plt.show()
 
 
 """

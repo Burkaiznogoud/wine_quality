@@ -7,6 +7,7 @@ import seaborn as sns
 from misc.processing import processing
 from misc.evaluation import evaluation
 from prepare_file import Data
+from datetime import datetime
 
 class Algorithm:
     f = Data()
@@ -52,13 +53,13 @@ class Algorithm:
     @processing
     def results_(self):
         self.results =   {
-                    'results': f"{__name__} of {__class__}",
-                    'parameters': f"{self.estimator.get_params}",
-                    'accuracy': f"{self.accuracy:.4f}",
-                    'precision': f"{self.precision:.4f}",
-                    'recall': f"{self.recall:.4f}",
-                    'f1': f"{self.f1:.4f}",
-                    'classification report': f"{self.classification_report}",
+                    'Results :': f"{__name__} of {__class__}",
+                    'Parameters :': f"{self.estimator.get_params}",
+                    'Accuracy :': f"{self.accuracy:.4f}",
+                    'Precision :': f"{self.precision:.4f}",
+                    'Recall :': f"{self.recall:.4f}",
+                    'F1 :': f"{self.f1:.4f}",
+                    'Cassification Report :': f"{self.classification_report}",
                     }
         return self.results
     
@@ -66,7 +67,8 @@ class Algorithm:
     def show_results(self):
         return self.results
     
-    def plot_confusion_matrix(self):
+    def plot_confusion_matrix(self, option = 'save'):
+        """Set option = show to plot confusion matrix. Default set to save."""
         cm = confusion_matrix(self.Y_test, self.Y_hat)
         ax= plt.subplot()
         sns.heatmap(cm, annot=True, ax = ax, fmt='d')
@@ -75,4 +77,9 @@ class Algorithm:
         ax.set_title('Confusion Matrix'); 
         ax.xaxis.set_ticklabels(['Not recommended', 'Recommended']) 
         ax.yaxis.set_ticklabels(['Not recommended', 'Recommended'])
-        plt.show()
+        if option == 'show':
+            plt.show()
+        else:
+            t = datetime.now().strftime("%Y-%m-%d %H:%M")
+            plt.savefig(f'.\wine_quality\plots\{self.__class__.__name__}_{t}.png')
+            plt.close()
