@@ -20,7 +20,7 @@ class SVM_Algorithm(Algorithm):
         self.train_classification_metrics()
         self.calculate_Y_hat()
         self.evaluate_classification_metrics()
-        self.get_feature_importance()
+        self.feature_selection()
         self.results_()
         self.show_results()
 
@@ -44,7 +44,7 @@ class SVM_Algorithm(Algorithm):
             return self.estimator
 
     @processing
-    def get_feature_importance(self):
+    def feature_selection(self):
         self.estimator.fit(self.X_train, self.Y_train)
         if len(self.X_test) != len(self.Y_test):
             raise ValueError(f"X_test {self.X_test.shape} and Y_test {self.Y_test.shape} must have the same number of samples.")

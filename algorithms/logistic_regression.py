@@ -1,6 +1,7 @@
 from sklearn.linear_model import LogisticRegression
 from algorithms.algorithm import Algorithm
 from misc.processing import processing
+from misc.evaluation import evaluation
 
 class LogisticRegression_Algorithm(Algorithm):
     def __init__(self, init_params = 'default'):
@@ -21,6 +22,7 @@ class LogisticRegression_Algorithm(Algorithm):
         self.calculate_Y_hat()
         self.evaluate_classification_metrics()
         self.results_()
+        self.feature_selection()
         self.show_results()
 
     @processing
@@ -40,6 +42,13 @@ class LogisticRegression_Algorithm(Algorithm):
         else:
             self.estimator = LogisticRegression(**init_params)
             return self.estimator
+
+    @evaluation        
+    def feature_selection(self):
+        coefficients = self.estimator.coef_[0]
+        self.features_selected = {feature: coeff for feature, coeff in zip(self.columns, coefficients)}
+        return self.features_selected
+        
         
 """
 Logistic Regression Algorithm:

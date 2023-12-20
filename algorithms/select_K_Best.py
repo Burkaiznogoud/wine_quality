@@ -22,7 +22,7 @@ class SKB_Algorithm(Algorithm):
         self.calculate_Y_hat()
         self.evaluate_classification_metrics()
         self.results_()
-        self.select_features()
+        self.feature_selection()
         self.show_results()
         
 
@@ -44,7 +44,7 @@ class SKB_Algorithm(Algorithm):
             return self.estimator
 
     @processing
-    def select_features(self):
+    def feature_selection(self):
         skb = SelectKBest(score_func = f_classif, k = self.K)
         skb.fit(self.X_train, self.Y_train)
         selected_indices = skb.get_support(indices=True)
